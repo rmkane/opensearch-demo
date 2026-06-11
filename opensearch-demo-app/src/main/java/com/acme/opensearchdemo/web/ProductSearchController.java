@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 
 import com.acme.opensearch.model.ProductsIndex;
 
+import com.acme.opensearchdemo.dto.ProductResponse;
+import com.acme.opensearchdemo.mapper.ProductResponseMapper;
 import com.acme.opensearchdemo.model.ProductDocument;
 import com.acme.opensearchdemo.service.ProductSearchService;
 
@@ -32,6 +34,7 @@ import com.acme.opensearchdemo.service.ProductSearchService;
 public class ProductSearchController {
 
 	private final ProductSearchService service;
+	private final ProductResponseMapper productResponseMapper;
 
 	// --- Spring Data OpenSearch (IndexOperations) ---
 
@@ -73,23 +76,37 @@ public class ProductSearchController {
 	// --- Spring Data repository ---
 
 	@PostMapping
-	public ResponseEntity<ProductDocument> save(@RequestBody ProductDocument document) {
-		return ResponseEntity.ok(service.save(document));
+	public ResponseEntity<ProductResponse> save(@RequestBody ProductDocument document) {
+		return ResponseEntity.ok(productResponseMapper.toDto(service.save(document)));
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<ProductDocument> replace(@PathVariable String id, @RequestBody ProductDocument document) {
-		return service.replace(id, document).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+	public ResponseEntity<ProductResponse> replace(@PathVariable String id, @RequestBody ProductDocument document) {
+		/* spotless:off */
+		return service.replace(id, document)
+				.map(productResponseMapper::toDto)
+				.map(ResponseEntity::ok)
+				.orElse(ResponseEntity.notFound().build());
+		/* spotless:on */
 	}
 
 	@PatchMapping("/{id}")
-	public ResponseEntity<ProductDocument> update(@PathVariable String id, @RequestBody ProductDocument patch) {
-		return service.update(id, patch).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+	public ResponseEntity<ProductResponse> update(@PathVariable String id, @RequestBody ProductDocument patch) {
+		/* spotless:off */
+		return service.update(id, patch)
+				.map(productResponseMapper::toDto)
+				.map(ResponseEntity::ok)
+				.orElse(ResponseEntity.notFound().build());
+		/* spotless:on */
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable String id) {
-		return service.deleteById(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+		/* spotless:off */
+		return service.deleteById(id)
+				? ResponseEntity.noContent().build()
+				: ResponseEntity.notFound().build();
+		/* spotless:on */
 	}
 
 	/**
@@ -108,12 +125,17 @@ public class ProductSearchController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<ProductDocument>> findAll() {
-		return ResponseEntity.ok(service.findAll());
+	public ResponseEntity<List<ProductResponse>> findAll() {
+		return ResponseEntity.ok(productResponseMapper.toDtoList(service.findAll()));
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<ProductDocument> findById(@PathVariable String id) {
-		return service.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+	public ResponseEntity<ProductResponse> findById(@PathVariable String id) {
+		/* spotless:off */
+		return service.findById(id)
+				.map(productResponseMapper::toDto)
+				.map(ResponseEntity::ok)
+				.orElse(ResponseEntity.notFound().build());
+		/* spotless:on */
 	}
 }

@@ -8,6 +8,8 @@ Multi-module Maven project:
 | `opensearch-util` | Framework-free OpenSearch helpers (`OpenSearchClientFactory`, `ProductIndexOperations`) |
 | `opensearch-demo-app` | Spring Boot demo app and HTTP API |
 
+DTO mapping conventions: [docs/mapping.md](docs/mapping.md)
+
 Build and run from the repo root:
 
 ```bash

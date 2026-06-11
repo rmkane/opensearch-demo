@@ -165,6 +165,18 @@ When aligning code with the dependency set:
 - `refreshInterval` expects `Time.of(t -> t.time("5s"))`, not a raw string.
 - HttpClient 5 no longer has `setSSLContext` on `HttpAsyncClientBuilder`; configure TLS via `PoolingAsyncClientConnectionManager` + `TlsStrategy`.
 
+## `strict_dynamic_mapping_exception` on save (`_class`)
+
+If `POST /api/products` returns 500 and the server log shows:
+
+```text
+strict_dynamic_mapping_exception ... dynamic introduction of [_class] within [_doc] is not allowed
+```
+
+The index was created with **strict** dynamic mapping (java-client path), but Spring Data tried to index a `_class` type-hint field that is not in the mapping.
+
+Fix: on `ProductDocument`, use `@Document(..., writeTypeHint = WriteTypeHint.FALSE)` so saves only include mapped fields. `ProductDocument` already sets `@Dynamic(Dynamic.STRICT)` so Spring Data index creation matches the java-client path.
+
 ## Quick run checklist
 
 ```bash

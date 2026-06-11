@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
@@ -27,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.acme.opensearchdemo.mapper.ProductResponseMapper;
 import com.acme.opensearchdemo.model.ProductDocument;
 import com.acme.opensearchdemo.service.ProductSearchService;
 
@@ -36,13 +36,13 @@ class ProductSearchControllerTest {
 	@Mock
 	private ProductSearchService service;
 
-	@InjectMocks
 	private ProductSearchController controller;
 
 	private MockMvc mockMvc;
 
 	@BeforeEach
 	void setUp() {
+		controller = new ProductSearchController(service, new ProductResponseMapper());
 		mockMvc = MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new GlobalExceptionHandler()).build();
 	}
 

@@ -8,7 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.acme.common.BaseControllerIntegrationTest;
+import com.acme.common.BaseIntegrationTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.acme.opensearchdemo.model.ProductDocument;
 
 @Tag("integration")
-class ProductSearchControllerIntegrationTest extends BaseControllerIntegrationTest {
+class ProductSearchControllerIntegrationTest extends BaseIntegrationTest {
 
 	private static final String BASE_URL = "/api/products";
 

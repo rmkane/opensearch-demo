@@ -55,8 +55,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 		}
 
 		log.info("Creating index '{}' via Spring Data OpenSearch", ProductsIndex.INDEX_NAME);
-		index.create();
-		index.putMapping(index.createMapping(ProductDocument.class));
+		index.createWithMapping();
 
 		log.info("Created index '{}' via Spring Data OpenSearch", ProductsIndex.INDEX_NAME);
 		/* spotless:off */
@@ -78,8 +77,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 		}
 
 		log.info("Recreating index '{}' via Spring Data OpenSearch", ProductsIndex.INDEX_NAME);
-		index.create();
-		index.putMapping(index.createMapping(ProductDocument.class));
+		index.createWithMapping();
 
 		log.info("Recreated index '{}' via Spring Data OpenSearch", ProductsIndex.INDEX_NAME);
 		/* spotless:off */

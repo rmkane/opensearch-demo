@@ -22,15 +22,15 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
  */
 @SpringBootApplication(exclude = {
 		/* spotless:off */
-	// Boot Elasticsearch data + REST clients (would ignore OPENSEARCH_URI / port 443)
-	ElasticsearchDataAutoConfiguration.class,
-	ElasticsearchRestClientAutoConfiguration.class,
-	// OpenSearch starter clients (HLRC, default REST transport, reactive)
-	OpenSearchRestHighLevelClientAutoConfiguration.class,
-	OpenSearchClientAutoConfiguration.class,
-	OpenSearchRestClientAutoConfiguration.class,
-	ReactiveOpenSearchClientAutoConfiguration.class
-	/* spotless:on */
+		// Boot Elasticsearch data + REST clients (would ignore OPENSEARCH_URI / port 443)
+		ElasticsearchDataAutoConfiguration.class,
+		ElasticsearchRestClientAutoConfiguration.class,
+		// OpenSearch starter clients (HLRC, default REST transport, reactive)
+		OpenSearchRestHighLevelClientAutoConfiguration.class,
+		OpenSearchClientAutoConfiguration.class,
+		OpenSearchRestClientAutoConfiguration.class,
+		ReactiveOpenSearchClientAutoConfiguration.class
+		/* spotless:on */
 })
 @EnableElasticsearchRepositories
 public class OpenSearchDemoApplication {

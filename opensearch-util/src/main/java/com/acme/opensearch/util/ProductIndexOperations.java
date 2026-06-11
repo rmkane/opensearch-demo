@@ -42,10 +42,13 @@ public class ProductIndexOperations {
 			/* spotless:on */
 		}
 
+		ProductsIndexSettingsSupport.Values indexSettings = ProductsIndexSettingsSupport.load();
 		log.info("Creating index '{}' via opensearch-java client", ProductsIndex.INDEX_NAME);
 		CreateIndexResponse response = client.indices()
 				.create(request -> request.index(ProductsIndex.INDEX_NAME)
-						.settings(settings -> settings.numberOfShards(1).numberOfReplicas(0))
+						.settings(settings -> settings.numberOfShards(indexSettings.numberOfShards())
+								.numberOfReplicas(indexSettings.numberOfReplicas())
+								.refreshInterval(Time.of(t -> t.time(indexSettings.refreshInterval()))))
 						// Strict dynamic mapping — reject documents with unknown fields.
 						.mappings(mapping -> mapping.dynamic(DynamicMapping.Strict)
 								.properties("id", property -> property.keyword(keyword -> keyword))

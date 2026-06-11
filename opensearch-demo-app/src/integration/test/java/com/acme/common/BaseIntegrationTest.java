@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-public abstract class BaseControllerIntegrationTest {
+public abstract class BaseIntegrationTest {
 
 	protected static final String SERVER_BASE = System.getenv().getOrDefault("API_BASE", "http://localhost:8080");
 

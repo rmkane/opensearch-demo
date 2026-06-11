@@ -21,9 +21,14 @@ import com.acme.opensearch.util.ProductIndexOperations;
 public class OpenSearchClientConfig {
 
 	@Bean
-	public OpenSearchClient openSearchClient(@Value("${OPENSEARCH_URI}") String uri,
-			@Value("${OPENSEARCH_USERNAME}") String username, @Value("${OPENSEARCH_PASSWORD}") String password,
-			@Value("${OPENSEARCH_TRUST_SELF_SIGNED:true}") boolean trustSelfSigned) {
+	public OpenSearchClient openSearchClient(
+			/* spotless:off */
+			@Value("${OPENSEARCH_URI}") String uri,
+			@Value("${OPENSEARCH_USERNAME}") String username,
+			@Value("${OPENSEARCH_PASSWORD}") String password,
+			@Value("${OPENSEARCH_TRUST_SELF_SIGNED:true}") boolean trustSelfSigned
+			/* spotless:on */
+	) {
 		OpenSearchConnectionProperties properties = new OpenSearchConnectionProperties(uri, username, password,
 				trustSelfSigned);
 		return OpenSearchClientFactory.create(properties);
