@@ -3,8 +3,10 @@ package com.acme.opensearchdemo.service.impl;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.IndexOperations;
@@ -111,18 +113,67 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 
 	@Override
 	public ProductDocument save(ProductDocument document) {
-		ProductDocument normalized = new ProductDocument(document.id(), document.name(), document.sku(),
-				document.price() == null ? BigDecimal.ZERO : document.price(), Instant.now());
-
+		ProductDocument normalized = normalize(document);
 		ProductDocument saved = repository.save(normalized);
 		log.info("Saved product id={} sku={} to index '{}'", saved.id(), saved.sku(), ProductsIndex.INDEX_NAME);
 		return saved;
 	}
 
 	@Override
-	public Iterable<ProductDocument> findAll() {
+	public Optional<ProductDocument> replace(String id, ProductDocument document) {
+		if (document.id() != null && !document.id().equals(id)) {
+			throw new IllegalArgumentException("ID in body does not match path");
+		}
+		if (!repository.existsById(id)) {
+			return Optional.empty();
+		}
+		ProductDocument replaced = normalize(
+				new ProductDocument(id, document.name(), document.sku(), document.price(), document.updatedOn()));
+		ProductDocument saved = repository.save(replaced);
+		log.info("Replaced product id={} in index '{}'", saved.id(), ProductsIndex.INDEX_NAME);
+		return Optional.of(saved);
+	}
+
+	@Override
+	public Optional<ProductDocument> update(String id, ProductDocument patch) {
+		return repository.findById(id).map(existing -> {
+			ProductDocument updated = normalize(
+					new ProductDocument(id, patch.name() != null ? patch.name() : existing.name(),
+							patch.sku() != null ? patch.sku() : existing.sku(),
+							patch.price() != null ? patch.price() : existing.price(), existing.updatedOn()));
+			ProductDocument saved = repository.save(updated);
+			log.info("Updated product id={} in index '{}'", saved.id(), ProductsIndex.INDEX_NAME);
+			return saved;
+		});
+	}
+
+	@Override
+	public boolean deleteById(String id) {
+		if (!repository.existsById(id)) {
+			return false;
+		}
+		repository.deleteById(id);
+		log.info("Deleted product id={} from index '{}'", id, ProductsIndex.INDEX_NAME);
+		return true;
+	}
+
+	@Override
+	public long purgeAll() {
+		long count = repository.count();
+		repository.deleteAll();
+		log.warn("Purged {} product(s) from index '{}'", count, ProductsIndex.INDEX_NAME);
+		return count;
+	}
+
+	private ProductDocument normalize(ProductDocument document) {
+		return new ProductDocument(document.id(), document.name(), document.sku(),
+				document.price() == null ? BigDecimal.ZERO : document.price(), Instant.now());
+	}
+
+	@Override
+	public List<ProductDocument> findAll() {
 		log.info("Listing all products from index '{}'", ProductsIndex.INDEX_NAME);
-		return repository.findAll();
+		return StreamSupport.stream(repository.findAll().spliterator(), false).toList();
 	}
 
 	@Override

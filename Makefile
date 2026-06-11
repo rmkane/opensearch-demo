@@ -19,7 +19,8 @@ export MAVEN_OPTS ?= --sun-misc-unsafe-memory-access=allow
         test compile format lint verify install \
         package build clean jar-path format-check \
         up down logs health \
-        api-spring-index api-java-index api-recreate-java-index api-add-field api-refresh api-save api-list api-get
+        api-spring-index api-java-index api-recreate-java-index api-add-field api-refresh \
+        api-save api-list api-get api-put api-patch api-delete api-purge
 
 .DEFAULT_GOAL := help
 
@@ -161,3 +162,19 @@ api-list:
 ## api-get: Get product by ID (default: p-1; override with make api-get ID=p-2)
 api-get:
 	./scripts/curl/api-get.sh $(ID)
+
+## api-put: Replace product by ID (default: p-1)
+api-put:
+	./scripts/curl/api-put.sh $(ID)
+
+## api-patch: Partially update product by ID (default: p-1)
+api-patch:
+	./scripts/curl/api-patch.sh $(ID)
+
+## api-delete: Delete product by ID (default: p-1; prints HTTP status)
+api-delete:
+	./scripts/curl/api-delete.sh $(ID)
+
+## api-purge: Delete all product documents (index mapping is kept)
+api-purge:
+	./scripts/curl/api-purge.sh
