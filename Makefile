@@ -1,13 +1,15 @@
 # OpenSearch Demo — use `make` or `make help` for targets
 
-MVN          := mvn
-ARTIFACT     := $(shell $(MVN) help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
-VERSION      := $(shell $(MVN) help:evaluate -Dexpression=project.version -q -DforceStdout)
-JAR          := target/$(ARTIFACT)-$(VERSION).jar
+APP_MODULE  := opensearch-demo-app
+MVN         := mvn -pl $(APP_MODULE) -am
+ARTIFACT    := $(shell mvn -pl $(APP_MODULE) help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
+VERSION     := $(shell mvn -pl $(APP_MODULE) help:evaluate -Dexpression=project.version -q -DforceStdout)
+JAR         := $(APP_MODULE)/target/$(ARTIFACT)-$(VERSION).jar
 MAIN_CLASS   := com.acme.opensearchdemo.OpenSearchDemoApplication
 DEBUG_PORT   ?= 8787
 JVM_DEBUG    := -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:$(DEBUG_PORT)
 ENV          := set -a && . ./local.env && set +a &&
+ID           ?= p-1
 
 # JDK 24+: silence sun.misc.Unsafe warnings from Spotless on newer local JDKs
 export MAVEN_OPTS ?= --sun-misc-unsafe-memory-access=allow
@@ -17,7 +19,7 @@ export MAVEN_OPTS ?= --sun-misc-unsafe-memory-access=allow
         test compile format lint verify install \
         package build clean jar-path format-check \
         up down logs health \
-        spring-index java-index recreate-java-index add-field refresh save list
+        api-spring-index api-java-index api-recreate-java-index api-add-field api-refresh api-save api-list api-get
 
 .DEFAULT_GOAL := help
 
@@ -38,7 +40,7 @@ jar-path:
 
 ## clean: Remove build output
 clean:
-	$(MVN) clean
+	mvn clean
 
 ## hooks: Install git pre-commit hook (Spotless + compile)
 hooks:
@@ -71,7 +73,7 @@ prod: jar
 ##@ Verify
 ## test: Run unit tests
 test:
-	$(MVN) test
+	mvn test
 
 ## compile: Compile main and test sources
 compile:
@@ -79,18 +81,18 @@ compile:
 
 ## format: Apply code formatting (Spotless)
 format:
-	$(MVN) spotless:apply -q
+	mvn spotless:apply -q
 
 ## lint: Check formatting and compile
 lint: format-check compile
 
 ## format-check: Check formatting without applying changes
 format-check:
-	$(MVN) spotless:check -q
+	mvn spotless:check -q
 
 ## verify: Run tests and package
 verify:
-	$(MVN) verify
+	mvn verify
 
 # --- Build --------------------------------------------------------------------
 
@@ -104,7 +106,7 @@ package:
 
 ## install: Install to local Maven repository
 install:
-	$(MVN) install
+	mvn install
 
 # --- OpenSearch ---------------------------------------------------------------
 
@@ -128,30 +130,34 @@ health:
 # --- API ----------------------------------------------------------------------
 
 ##@ API
-## spring-index: Create index via Spring Data OpenSearch IndexOperations
-spring-index:
-	./scripts/curl/spring-index.sh
+## api-spring-index: Create index via Spring Data OpenSearch IndexOperations
+api-spring-index:
+	./scripts/curl/api-spring-index.sh
 
-## java-index: Create index via direct opensearch-java client
-java-index:
-	./scripts/curl/java-index.sh
+## api-java-index: Create index via direct opensearch-java client
+api-java-index:
+	./scripts/curl/api-java-index.sh
 
-## recreate-java-index: Recreate index via direct opensearch-java client
-recreate-java-index:
-	./scripts/curl/recreate-java-index.sh
+## api-recreate-java-index: Recreate index via direct opensearch-java client
+api-recreate-java-index:
+	./scripts/curl/api-recreate-java-index.sh
 
-## add-field: Add description field to existing mapping using opensearch-java
-add-field:
-	./scripts/curl/add-field.sh
+## api-add-field: Add description field to existing mapping using opensearch-java
+api-add-field:
+	./scripts/curl/api-add-field.sh
 
-## refresh: Update refresh_interval to 5s using opensearch-java
-refresh:
-	./scripts/curl/refresh.sh
+## api-refresh: Update refresh_interval to 5s using opensearch-java
+api-refresh:
+	./scripts/curl/api-refresh.sh
 
-## save: Save a sample product document through Spring Data repository
-save:
-	./scripts/curl/save.sh
+## api-save: Save a sample product document through Spring Data repository
+api-save:
+	./scripts/curl/api-save.sh
 
-## list: List documents through Spring Data repository
-list:
-	./scripts/curl/list.sh
+## api-list: List documents through Spring Data repository
+api-list:
+	./scripts/curl/api-list.sh
+
+## api-get: Get product by ID (default: p-1; override with make api-get ID=p-2)
+api-get:
+	./scripts/curl/api-get.sh $(ID)

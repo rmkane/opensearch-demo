@@ -1,5 +1,22 @@
 # OpenSearch Spring Boot Demo
 
+Multi-module Maven project:
+
+| Module | Purpose |
+| ------ | ------- |
+| `opensearch-model` | Shared domain types (`Product`, `ProductsIndex`, `ApiInfo`) |
+| `opensearch-util` | Framework-free OpenSearch helpers (`OpenSearchClientFactory`, `ProductIndexOperations`) |
+| `opensearch-demo-app` | Spring Boot demo app and HTTP API |
+
+Build and run from the repo root:
+
+```bash
+source local.env
+make up
+make run          # mvn -pl opensearch-demo-app -am spring-boot:run
+make verify       # all modules
+```
+
 This is a minimal Spring Boot 3.5.x / Java 21 project that demonstrates:
 
 - `spring-data-opensearch-starter`
@@ -66,7 +83,7 @@ make run
 ## Create the index using Spring Data OpenSearch
 
 ```bash
-make spring-index
+make api-spring-index
 ```
 
 or:
@@ -78,7 +95,7 @@ curl -X POST http://localhost:8080/api/products/index/spring-data
 ## Create/recreate the index using the direct Java client
 
 ```bash
-make recreate-java-index
+make api-recreate-java-index
 ```
 
 or:
@@ -90,7 +107,7 @@ curl -X PUT http://localhost:8080/api/products/index/java-client
 ## Add a new mapping field using the direct Java client
 
 ```bash
-make add-field
+make api-add-field
 ```
 
 This adds a `description` field to the existing index mapping.
@@ -100,7 +117,7 @@ Important: OpenSearch allows adding fields to an existing mapping, but it does n
 ## Update an index setting using the direct Java client
 
 ```bash
-make refresh
+make api-refresh
 ```
 
 This updates `index.refresh_interval` to `5s`.
@@ -108,8 +125,8 @@ This updates `index.refresh_interval` to `5s`.
 ## Save a document using the Spring Data repository
 
 ```bash
-make save
-make list
+make api-save
+make api-list
 ```
 
 ## Manual sample document

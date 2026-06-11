@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+app:
+  base-url: ${APP_BASE_URL:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
+spring:
+  application:
+    name: opensearch-demo
+
+  # The whole point of this sample: use HTTPS with an explicit port override.
+  # Set via local.env (source local.env) or OPENSEARCH_* env vars.
+  # Local Docker maps host 443 -> container 9200.
+  opensearch:
+    uris: ${OPENSEARCH_URI}
+    username: ${OPENSEARCH_USERNAME}
+    password: "${OPENSEARCH_PASSWORD}"
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.acme.opensearchdemo: INFO
+    org.opensearch: INFO
+    org.springframework.data.elasticsearch: DEBUG

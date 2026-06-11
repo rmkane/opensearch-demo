@@ -14,19 +14,40 @@
     <groupId>com.acme</groupId>
     <artifactId>opensearch-demo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>opensearch-demo</name>
+
+    <modules>
+        <module>opensearch-model</module>
+        <module>opensearch-util</module>
+        <module>opensearch-demo-app</module>
+    </modules>
 
     <properties>
         <java.version>21</java.version>
-        <!-- Versions -->
+        <!-- Aggregator has no main class; demo-app overrides this to false. -->
+        <spring-boot.run.skip>true</spring-boot.run.skip>
+        <!-- Dependencies -->
         <opensearch-java.version>3.9.0</opensearch-java.version>
-        <spotless.version>3.6.0</spotless.version>
         <spring-data-opensearch.version>2.0.2</spring-data-opensearch.version>
         <springdoc.version>2.8.9</springdoc.version>
+        <!-- Plugins -->
+        <exec-maven-plugin.version>3.6.3</exec-maven-plugin.version>
+        <spotless.version>3.6.0</spotless.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.acme</groupId>
+                <artifactId>opensearch-model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.acme</groupId>
+                <artifactId>opensearch-util</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.opensearch.client</groupId>
                 <artifactId>spring-data-opensearch-starter</artifactId>
@@ -45,63 +66,16 @@
         </dependencies>
     </dependencyManagement>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.opensearch.client</groupId>
-            <artifactId>spring-data-opensearch-starter</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.opensearch.client</groupId>
-            <artifactId>opensearch-java</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -116,22 +90,30 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec-maven-plugin.version}</version>
+            </plugin>
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>${spotless.version}</version>
                 <configuration>
-                <java>
-                    <eclipse>
-                        <version>4.28</version>
-                    </eclipse>
-                    <importOrder>
-                    <order>java,javax,jakarta,org,com,lombok,io,\#,com.acme.opensearchdemo</order>
-                    </importOrder>
-                    <removeUnusedImports/>
-                    <toggleOffOn/>
-                </java>
+                    <java>
+                        <eclipse>
+                            <version>4.28</version>
+                        </eclipse>
+                        <importOrder>
+                            <order>java,javax,jakarta,org,com,lombok,io,\#,com.acme.opensearch,com.acme.opensearchdemo</order>
+                        </importOrder>
+                        <removeUnusedImports/>
+                        <toggleOffOn/>
+                    </java>
                 </configuration>
             </plugin>
         </plugins>
