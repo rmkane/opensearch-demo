@@ -1,6 +1,9 @@
 # Maven
 target/
 
+# Logs
+logs/
+
 # Environment
 .env
 
@@ -9,7 +12,9 @@ target/
 *.iml
 
 # VS Code
-.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
 
 # Eclipse
 .eclipse/

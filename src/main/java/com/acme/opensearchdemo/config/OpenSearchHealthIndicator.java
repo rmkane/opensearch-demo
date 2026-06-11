@@ -8,7 +8,9 @@ import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component("opensearch")
 @RequiredArgsConstructor
 public class OpenSearchHealthIndicator implements HealthIndicator {
@@ -22,11 +24,16 @@ public class OpenSearchHealthIndicator implements HealthIndicator {
 			HealthStatus status = response.status();
 
 			Health.Builder builder = isClusterHealthy(status) ? Health.up() : Health.down();
+			if (!isClusterHealthy(status)) {
+				log.warn("OpenSearch cluster unhealthy: status={}, unassignedShards={}", status.jsonValue(),
+						response.unassignedShards());
+			}
 			return builder.withDetail("clusterName", response.clusterName()).withDetail("status", status.jsonValue())
 					.withDetail("numberOfNodes", response.numberOfNodes())
 					.withDetail("activeShards", response.activeShards())
 					.withDetail("unassignedShards", response.unassignedShards()).build();
 		} catch (Exception ex) {
+			log.error("OpenSearch health check failed", ex);
 			return Health.down().withException(ex).build();
 		}
 	}

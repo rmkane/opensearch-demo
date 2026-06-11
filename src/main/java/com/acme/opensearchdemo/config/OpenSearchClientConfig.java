@@ -26,6 +26,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Configuration
 public class OpenSearchClientConfig {
 
@@ -57,6 +60,8 @@ public class OpenSearchClientConfig {
 				});
 
 		OpenSearchTransport transport = builder.build();
+		log.info("OpenSearch client configured for {}://{}:{} (trustSelfSigned={})", parsedUri.getScheme(),
+				parsedUri.getHost(), host.getPort(), trustSelfSigned);
 		return new OpenSearchClient(transport);
 	}
 

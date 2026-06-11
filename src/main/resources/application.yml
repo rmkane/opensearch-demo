@@ -30,5 +30,6 @@ springdoc:
 
 logging:
   level:
+    com.acme.opensearchdemo: INFO
     org.opensearch: INFO
     org.springframework.data.elasticsearch: DEBUG

@@ -12,7 +12,7 @@ ENV          := set -a && . ./local.env && set +a &&
 # JDK 24+: silence sun.misc.Unsafe warnings from Spotless on newer local JDKs
 export MAVEN_OPTS ?= --sun-misc-unsafe-memory-access=allow
 
-.PHONY: help develop verify build \
+.PHONY: help develop verify build hooks \
         dev debug run jar prod \
         test compile format lint verify install \
         package build clean jar-path format-check \
@@ -39,6 +39,10 @@ jar-path:
 ## clean: Remove build output
 clean:
 	$(MVN) clean
+
+## hooks: Install git pre-commit hook (Spotless + compile)
+hooks:
+	./scripts/install-git-hooks.sh
 
 # --- Develop ------------------------------------------------------------------
 
@@ -119,37 +123,35 @@ logs:
 
 ## health: Check OpenSearch through host port 443 (sources local.env)
 health:
-	$(ENV) curl -k -u "$$OPENSEARCH_USERNAME:$$OPENSEARCH_PASSWORD" "$$OPENSEARCH_URI/_cluster/health?pretty"
+	./scripts/curl/opensearch-health.sh
 
 # --- API ----------------------------------------------------------------------
 
 ##@ API
 ## spring-index: Create index via Spring Data OpenSearch IndexOperations
 spring-index:
-	curl -s -X POST http://localhost:8080/api/products/index/spring-data | jq .
+	./scripts/curl/spring-index.sh
 
 ## java-index: Create index via direct opensearch-java client
 java-index:
-	curl -s -X POST http://localhost:8080/api/products/index/java-client | jq .
+	./scripts/curl/java-index.sh
 
 ## recreate-java-index: Recreate index via direct opensearch-java client
 recreate-java-index:
-	curl -s -X PUT http://localhost:8080/api/products/index/java-client | jq .
+	./scripts/curl/recreate-java-index.sh
 
 ## add-field: Add description field to existing mapping using opensearch-java
 add-field:
-	curl -s -X PUT http://localhost:8080/api/products/index/java-client/mapping/description | jq .
+	./scripts/curl/add-field.sh
 
 ## refresh: Update refresh_interval to 5s using opensearch-java
 refresh:
-	curl -s -X PUT http://localhost:8080/api/products/index/java-client/settings/refresh-interval/5s | jq .
+	./scripts/curl/refresh.sh
 
 ## save: Save a sample product document through Spring Data repository
 save:
-	curl -s -X POST http://localhost:8080/api/products \
-		-H 'Content-Type: application/json' \
-		-d '{"id":"p-1","name":"Coffee Mug","sku":"MUG-001","price":12.99}' | jq .
+	./scripts/curl/save.sh
 
 ## list: List documents through Spring Data repository
 list:
-	curl -s http://localhost:8080/api/products | jq .
+	./scripts/curl/list.sh

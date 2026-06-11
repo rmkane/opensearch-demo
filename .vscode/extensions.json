@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "redhat.java",
+        "vscjava.vscode-java-debug",
+        "vscjava.vscode-java-dependency-plugin",
+        "vscjava.vscode-java-dependency",
+        "vscjava.vscode-java-pack-plugin",
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-java-test-plugin",
+        "vscjava.vscode-java-test",
+        "vscjava.vscode-maven",
+    ]
+}

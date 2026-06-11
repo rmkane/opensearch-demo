@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+export MAVEN_OPTS="${MAVEN_OPTS:---sun-misc-unsafe-memory-access=allow}"
+
+echo "pre-commit: spotless:check"
+mvn spotless:check -q
+
+echo "pre-commit: compile"
+mvn compile test-compile -q
