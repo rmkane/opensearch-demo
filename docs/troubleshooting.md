@@ -83,18 +83,20 @@ Exclude conflicting auto-config in `OpenSearchDemoApplication`:
 - `OpenSearchRestClientAutoConfiguration`
 - `ReactiveOpenSearchClientAutoConfiguration`
 
-Provide a single `OpenSearchClient` in `OpenSearchClientConfig` that reads `OPENSEARCH_*` from the environment. Spring Data’s `OpenSearchDataConfiguration.JavaClientConfiguration` then uses that bean.
+Provide a single `OpenSearchClient` in `OpenSearchClientConfig` that reads `app.opensearch.*` (populated from `OPENSEARCH_*` in `local.env`). Spring Data’s `OpenSearchDataConfiguration.JavaClientConfiguration` then uses that bean.
+
+Do **not** add a `spring.opensearch.*` block expecting it to drive the client — auto-config is excluded; only `app.opensearch` is used.
 
 ## Local configuration (`local.env`)
 
-Connection settings live in `local.env` at the repo root:
+Connection settings live in `local.env` at the repo root and are bound into `app.opensearch`:
 
-| Variable | Purpose |
-| -------- | ------- |
-| `OPENSEARCH_URI` | Cluster URL (`https://localhost:443`) |
-| `OPENSEARCH_USERNAME` | Admin username |
-| `OPENSEARCH_PASSWORD` | Admin password |
-| `OPENSEARCH_TRUST_SELF_SIGNED` | Trust local self-signed TLS (`true` for Docker demo) |
+| Variable | `app.opensearch` property | Purpose |
+| -------- | ------------------------- | ------- |
+| `OPENSEARCH_URI` | `uri` | Cluster URL (`https://localhost:443`) |
+| `OPENSEARCH_USERNAME` | `username` | Admin username |
+| `OPENSEARCH_PASSWORD` | `password` | Admin password |
+| `OPENSEARCH_TRUST_SELF_SIGNED` | `trust-self-signed` | Trust local self-signed TLS (`true` for Docker demo) |
 
 Always `source local.env` before Compose, curl, or the app:
 
@@ -138,8 +140,10 @@ In `application.yml`, unquoted `#` starts a YAML comment:
 # Broken — everything after # is ignored
 password: ${OPENSEARCH_PASSWORD:Str0ng!Demo#9}
 
-# Correct
-password: "${OPENSEARCH_PASSWORD:Str0ng!Demo#9}"
+# Correct (app.opensearch, not spring.opensearch)
+app:
+  opensearch:
+    password: "${OPENSEARCH_PASSWORD:Str0ng!Demo#9}"
 ```
 
 ## Actuator health
@@ -186,7 +190,7 @@ strict_dynamic_mapping_exception ... dynamic introduction of [id] within [_doc] 
 
 `make down` runs `docker compose down -v`, which deletes volumes and **all indices**. After `make up`, the `products` index is gone.
 
-If the index is recreated via Spring Data (`make api-spring-index`, or app startup auto-create), the mapping includes only `@Field` properties (`name`, `sku`, `price`, `updatedOn`). Spring Data treats `@Id` as document metadata and does **not** add `id` to the mapping.
+If the index is recreated via Spring Data (`make api-spring-index`, or app startup auto-create), the mapping includes only `@Field` properties (`name`, `sku`, `price`, `updatedOn`). Spring Data treats `@Id` as document metadata and does **not** add `id` to the mapping. Prefer the **java-client** index endpoints for real use; Spring Data index creation is comparison/demo only in this project.
 
 Saves still write `id` into `_source`. With `dynamic: strict` (from `settings.json`), OpenSearch rejects the unknown field.
 

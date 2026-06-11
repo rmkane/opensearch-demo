@@ -31,13 +31,20 @@ This is a minimal Spring Boot 3.5.x / Java 21 project that demonstrates:
 - updating index settings
 - Docker Compose mapping local host port `443` to OpenSearch container port `9200`
 
-The local OpenSearch URL is intentionally:
+This demo intentionally disables Spring Boot Elasticsearch/OpenSearch auto-configuration and provides one explicit `OpenSearchClient` bean. This avoids default fallback behavior to `localhost:9200` and allows testing AWS-style HTTPS endpoints on port `443`. See [docs/troubleshooting.md](docs/troubleshooting.md) for the exclusion list and rationale.
+
+Connection settings are bound via `@ConfigurationProperties` under `app.opensearch` (not `spring.opensearch.*`):
 
 ```yaml
-spring:
+app:
   opensearch:
-    uris: https://localhost:443
+    uri: ${OPENSEARCH_URI}          # https://localhost:443
+    username: ${OPENSEARCH_USERNAME}
+    password: "${OPENSEARCH_PASSWORD}"
+    trust-self-signed: ${OPENSEARCH_TRUST_SELF_SIGNED:true}
 ```
+
+On startup the app logs the resolved URI, e.g. `Using OpenSearch URI: https://localhost:443`.
 
 The Docker Compose file exposes only:
 
@@ -84,19 +91,9 @@ source local.env
 make run
 ```
 
-## Create the index using Spring Data OpenSearch
+## Create/recreate the index (recommended — java-client)
 
-```bash
-make api-spring-index
-```
-
-or:
-
-```bash
-curl -X POST http://localhost:8080/api/products/index/spring-data
-```
-
-## Create/recreate the index using the direct Java client
+Use the java-client path for the canonical mapping (includes the `id` field required by strict saves):
 
 ```bash
 make api-recreate-java-index
@@ -106,6 +103,20 @@ or:
 
 ```bash
 curl -X PUT http://localhost:8080/api/products/index/java-client
+```
+
+## Create the index using Spring Data OpenSearch (comparison only)
+
+Spring Data index creation omits `id` from the mapping; use this endpoint to compare approaches, not for CRUD against a strict index. See [docs/troubleshooting.md](docs/troubleshooting.md#strict-mapping--missing-id-after-make-down).
+
+```bash
+make api-spring-index
+```
+
+or:
+
+```bash
+curl -X POST http://localhost:8080/api/products/index/spring-data
 ```
 
 ## Add a new mapping field using the direct Java client
@@ -161,12 +172,12 @@ If your application tries `https://localhost:9200`, you have reproduced the unwa
 
 ## Notes
 
-For AWS OpenSearch, use the explicit port:
+For AWS OpenSearch, set the explicit port in `local.env` or `app.opensearch.uri`:
 
 ```yaml
-spring:
+app:
   opensearch:
-    uris: https://your-domain.region.es.amazonaws.com:443
+    uri: https://your-domain.region.es.amazonaws.com:443
 ```
 
 For production, do not use trust-all SSL. This sample trusts the local self-signed demo certificate only to simplify local development.

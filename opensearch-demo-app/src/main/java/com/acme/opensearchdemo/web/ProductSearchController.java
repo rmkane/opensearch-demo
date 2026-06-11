@@ -35,6 +35,10 @@ import com.acme.opensearchdemo.service.ProductSearchService;
 /**
  * Demo endpoints comparing Spring Data OpenSearch and the direct
  * {@code opensearch-java} client.
+ * <p>
+ * Index lifecycle: use the {@code /index/java-client} endpoints for the
+ * canonical mapping (includes {@code id}). Spring Data index endpoints are
+ * comparison-only — their mapping omits {@code id}, which breaks strict saves.
  */
 @RestController
 @RequestMapping("/api/products")
@@ -44,25 +48,17 @@ public class ProductSearchController {
 	private final ProductSearchService service;
 	private final ProductResponseMapper productResponseMapper;
 
-	// --- Spring Data OpenSearch (IndexOperations) ---
+	// --- opensearch-java client (canonical index path) ---
 
-	@PostMapping("/index/spring-data")
-	public ResponseEntity<Map<String, Object>> createIndexUsingSpringData() {
-		return ResponseEntity.ok(service.createIndexUsingSpringData());
-	}
-
-	@PutMapping("/index/spring-data")
-	public ResponseEntity<Map<String, Object>> recreateIndexUsingSpringData() {
-		return ResponseEntity.ok(service.recreateIndexUsingSpringData());
-	}
-
-	// --- opensearch-java client ---
-
+	@Operation(summary = "Create index (java-client)", description = """
+			Recommended path. Creates the products index with strict mapping including the id field.""")
 	@PostMapping("/index/java-client")
 	public ResponseEntity<Map<String, Object>> createIndexUsingJavaClient() throws IOException {
 		return ResponseEntity.ok(service.createIndexUsingJavaClient());
 	}
 
+	@Operation(summary = "Recreate index (java-client)", description = """
+			Recommended path. Deletes and recreates the products index with the full mapping.""")
 	@PutMapping("/index/java-client")
 	public ResponseEntity<Map<String, Object>> recreateIndexUsingJavaClient() throws IOException {
 		return ResponseEntity.ok(service.recreateIndexUsingJavaClient());
@@ -79,6 +75,22 @@ public class ProductSearchController {
 	public ResponseEntity<Map<String, Object>> updateRefreshIntervalUsingJavaClient(
 			@PathVariable String refreshInterval) throws IOException {
 		return ResponseEntity.ok(service.updateRefreshIntervalUsingJavaClient(refreshInterval));
+	}
+
+	// --- Spring Data OpenSearch (IndexOperations — comparison / demo only) ---
+
+	@Operation(summary = "Create index (Spring Data)", description = """
+			Comparison/demo only. Mapping omits id; use java-client index creation for CRUD.""")
+	@PostMapping("/index/spring-data")
+	public ResponseEntity<Map<String, Object>> createIndexUsingSpringData() {
+		return ResponseEntity.ok(service.createIndexUsingSpringData());
+	}
+
+	@Operation(summary = "Recreate index (Spring Data)", description = """
+			Comparison/demo only. Mapping omits id; use java-client index creation for CRUD.""")
+	@PutMapping("/index/spring-data")
+	public ResponseEntity<Map<String, Object>> recreateIndexUsingSpringData() {
+		return ResponseEntity.ok(service.recreateIndexUsingSpringData());
 	}
 
 	// --- Spring Data repository ---

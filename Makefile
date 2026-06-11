@@ -131,17 +131,17 @@ health:
 # --- API ----------------------------------------------------------------------
 
 ##@ API
-## api-spring-index: Create index via Spring Data OpenSearch IndexOperations
-api-spring-index:
-	./scripts/curl/api-spring-index.sh
-
-## api-java-index: Create index via direct opensearch-java client
+## api-java-index: Create index via opensearch-java (recommended mapping)
 api-java-index:
 	./scripts/curl/api-java-index.sh
 
-## api-recreate-java-index: Recreate index via direct opensearch-java client
+## api-recreate-java-index: Recreate index via opensearch-java (recommended)
 api-recreate-java-index:
 	./scripts/curl/api-recreate-java-index.sh
+
+## api-spring-index: Create index via Spring Data (comparison only; mapping omits id)
+api-spring-index:
+	./scripts/curl/api-spring-index.sh
 
 ## api-add-field: Add description field to existing mapping using opensearch-java
 api-add-field:
