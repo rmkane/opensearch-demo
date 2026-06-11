@@ -28,10 +28,14 @@ public class OpenSearchHealthIndicator implements HealthIndicator {
 				log.warn("OpenSearch cluster unhealthy: status={}, unassignedShards={}", status.jsonValue(),
 						response.unassignedShards());
 			}
-			return builder.withDetail("clusterName", response.clusterName()).withDetail("status", status.jsonValue())
+			/* spotless:off */
+			return builder.withDetail("clusterName", response.clusterName())
+					.withDetail("status", status.jsonValue())
 					.withDetail("numberOfNodes", response.numberOfNodes())
 					.withDetail("activeShards", response.activeShards())
-					.withDetail("unassignedShards", response.unassignedShards()).build();
+					.withDetail("unassignedShards", response.unassignedShards())
+					.build();
+			/* spotless:on */
 		} catch (Exception ex) {
 			log.error("OpenSearch health check failed", ex);
 			return Health.down().withException(ex).build();

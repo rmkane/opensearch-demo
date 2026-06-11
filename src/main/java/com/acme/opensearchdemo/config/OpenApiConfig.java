@@ -11,7 +11,12 @@ public class OpenApiConfig {
 
 	@Bean
 	public OpenAPI openAPI() {
-		return new OpenAPI().info(new Info().title("OpenSearch Demo API")
-				.description("Spring Boot demo for spring-data-opensearch and opensearch-java").version("v1"));
+		/* spotless:off */
+		return new OpenAPI()
+				.info(new Info()
+				.title("OpenSearch Demo API")
+				.description("Spring Boot demo for spring-data-opensearch and opensearch-java")
+				.version("v1"));
+		/* spotless:on */
 	}
 }
