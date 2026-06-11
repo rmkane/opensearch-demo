@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -15,6 +17,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+	@ExceptionHandler({UnsatisfiedServletRequestParameterException.class,
+			MissingServletRequestParameterException.class})
+	public ProblemDetail handleMissingRequestParameter(Exception ex) {
+		log.warn("Request parameter not met: {}", ex.getMessage());
+		return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+	}
 
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ProblemDetail handleBadRequest(IllegalArgumentException ex) {

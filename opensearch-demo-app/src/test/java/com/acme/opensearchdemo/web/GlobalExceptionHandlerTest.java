@@ -1,11 +1,13 @@
 package com.acme.opensearchdemo.web;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,6 +18,15 @@ class GlobalExceptionHandlerTest {
 	@BeforeEach
 	void setUp() {
 		handler = new GlobalExceptionHandler();
+	}
+
+	@Test
+	void handleMissingRequestParameter() {
+		ProblemDetail problem = handler.handleMissingRequestParameter(
+				new UnsatisfiedServletRequestParameterException(new String[]{"purge"}, Map.of()));
+
+		assertThat(problem.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(problem.getDetail()).contains("purge");
 	}
 
 	@Test

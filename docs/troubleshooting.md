@@ -16,6 +16,7 @@ Notes from getting this demo running locally with Spring Boot 3.5.x, Actuator, a
 - [Actuator health](#actuator-health)
 - [API compatibility (2.0.2 / 3.9.0)](#api-compatibility-202--390)
 - [Strict mapping / `_class` on save](#strict-mapping--_class-on-save)
+- [Strict mapping / missing `id` after `make down`](#strict-mapping--missing-id-after-make-down)
 - [Quick run checklist](#quick-run-checklist)
 
 ## Version compatibility
@@ -173,12 +174,53 @@ The index was created with **strict** dynamic mapping (java-client path), but Sp
 
 **Fix:** on `ProductDocument`, use `@Document(..., writeTypeHint = WriteTypeHint.FALSE)` so saves only include mapped fields. Set `dynamic = Dynamic.STRICT` on `@Document` so Spring Data index creation matches the java-client path.
 
+## Strict mapping / missing `id` after `make down`
+
+If `POST /api/products` returns 500 after `make down` and `make up`, and the server log shows:
+
+```text
+strict_dynamic_mapping_exception ... dynamic introduction of [id] within [_doc] is not allowed
+```
+
+**Cause**
+
+`make down` runs `docker compose down -v`, which deletes volumes and **all indices**. After `make up`, the `products` index is gone.
+
+If the index is recreated via Spring Data (`make api-spring-index`, or app startup auto-create), the mapping includes only `@Field` properties (`name`, `sku`, `price`, `updatedOn`). Spring Data treats `@Id` as document metadata and does **not** add `id` to the mapping.
+
+Saves still write `id` into `_source`. With `dynamic: strict` (from `settings.json`), OpenSearch rejects the unknown field.
+
+The java-client path (`ProductIndexOperations`) explicitly maps `id` as `keyword`, so saves work when that index exists.
+
+**Fix**
+
+Recreate the index with the java-client mapping before saving products:
+
+```bash
+make api-recreate-java-index
+```
+
+Or call `PUT http://localhost:8080/api/products/index/java-client` while the app is running.
+
+Integration tests call this endpoint in `shouldCreateIndex` before CRUD tests. After a fresh cluster, run the app first (`make run`), then integration tests.
+
+**Verify mapping**
+
+```bash
+source local.env
+curl -sk -u "$OPENSEARCH_USERNAME:$OPENSEARCH_PASSWORD" \
+  "$OPENSEARCH_URI/products" | jq '.products.mappings.properties | keys'
+```
+
+You should see `id` in the list. A Spring Data–only index omits it.
+
 ## Quick run checklist
 
 ```bash
 source local.env
-make up          # wait for healthy container
-make run         # Spring Boot on :8080
-make health      # curl cluster health via :443
+make up                        # wait for healthy container
+make run                       # Spring Boot on :8080
+make api-recreate-java-index   # products index with id mapping (required after make down -v)
+make health                    # curl cluster health via :443
 curl http://localhost:8080/actuator/health
 ```

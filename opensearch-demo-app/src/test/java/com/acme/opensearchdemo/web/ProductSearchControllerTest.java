@@ -142,6 +142,11 @@ class ProductSearchControllerTest {
 	}
 
 	@Test
+	void purgeAllWithoutQueryParamReturnsBadRequest() throws Exception {
+		mockMvc.perform(delete("/api/products").accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+	}
+
+	@Test
 	void purgeAllReturnsDeletedCount() throws Exception {
 		when(service.purgeAll()).thenReturn(2L);
 

@@ -13,9 +13,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import com.acme.opensearch.model.ProductsIndex;
 
@@ -75,6 +83,17 @@ public class ProductSearchController {
 
 	// --- Spring Data repository ---
 
+	@Operation(summary = "Create or update a product", description = """
+			Persists a product to the OpenSearch products index. \
+			Provide id, name, sku, and price; updatedOn is assigned by the server.""", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductDocument.class), examples = @ExampleObject(name = "sampleProduct", summary = "Coffee mug", value = """
+			{
+			  "id": "p-1",
+			  "name": "Coffee Mug",
+			  "sku": "MUG-001",
+			  "price": 12.99
+			}
+			"""))))
+	@ApiResponse(responseCode = "200", description = "Saved product", content = @Content(schema = @Schema(implementation = ProductResponse.class)))
 	@PostMapping
 	public ResponseEntity<ProductResponse> save(@RequestBody ProductDocument document) {
 		return ResponseEntity.ok(productResponseMapper.toDto(service.save(document)));
@@ -112,8 +131,16 @@ public class ProductSearchController {
 	/**
 	 * Deletes every document in the index; mapping and settings are left intact.
 	 */
+	@Operation(summary = "Purge all products", description = """
+			Deletes every document in the products index. \
+			Mapping and settings are left intact. Requires query parameter purge=true.""")
+	@ApiResponse(responseCode = "200", description = "Purge summary")
 	@DeleteMapping(params = "purge")
-	public ResponseEntity<Map<String, Object>> purgeAll() {
+	public ResponseEntity<Map<String, Object>> purgeAll(
+			@Parameter(description = "Must be true to purge all documents", required = true, example = "true") @RequestParam(name = "purge") boolean purge) {
+		if (!purge) {
+			throw new IllegalArgumentException("Query parameter purge must be true");
+		}
 		long deleted = service.purgeAll();
 		/* spotless:off */
 		return ResponseEntity.ok(Map.ofEntries(

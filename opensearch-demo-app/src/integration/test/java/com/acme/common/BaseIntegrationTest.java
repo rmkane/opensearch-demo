@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -44,6 +47,11 @@ public abstract class BaseIntegrationTest {
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to write response to file", e);
 		}
+	}
+
+	protected Map<String, Object> parseBody(String body) throws JsonProcessingException {
+		return objectMapper.readValue(body, new TypeReference<Map<String, Object>>() {
+		});
 	}
 
 	protected void captureResponse(String body, String fileName) {
