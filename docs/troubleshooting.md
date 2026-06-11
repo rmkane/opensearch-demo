@@ -1,45 +1,41 @@
+<!-- omit in toc -->
 # Troubleshooting
 
 Notes from getting this demo running locally with Spring Boot 3.5.x, Actuator, and OpenSearch 3.x on host port 443.
 
-## Table of Contents
+<!-- omit in toc -->
+## Contents
 
-- [Troubleshooting](#troubleshooting)
-  - [Table of Contents](#table-of-contents)
-  - [Version compatibility](#version-compatibility)
-    - [Do not use `spring-data-opensearch` 3.0.x with Spring Boot 3.5. That line targets Spring Boot 4.x and pulls in `spring-boot-data-*` 4.x modules, which clash with Boot 3.5 auto-configuration.](#do-not-use-spring-data-opensearch-30x-with-spring-boot-35-that-line-targets-spring-boot-4x-and-pulls-in-spring-boot-data--4x-modules-which-clash-with-boot-35-auto-configuration)
-  - [Startup failure: duplicate `repositoryTagsProvider` bean](#startup-failure-duplicate-repositorytagsprovider-bean)
-    - [Symptom](#symptom)
-    - [Cause](#cause)
-    - [Fix](#fix)
-  - [Startup failure: connection to `http://localhost:9200`](#startup-failure-connection-to-httplocalhost9200)
-    - [Symptom](#symptom-1)
-    - [Cause](#cause-1)
-    - [Fix](#fix-1)
-  - [Local configuration: `local.env`](#local-configuration-localenv)
-    - [Always source before Compose, curl, or the app:](#always-source-before-compose-curl-or-the-app)
-  - [OpenSearch admin password strength](#opensearch-admin-password-strength)
-    - [Symptom](#symptom-2)
-    - [Fix](#fix-2)
-  - [YAML: quote passwords containing `#`](#yaml-quote-passwords-containing-)
-  - [Actuator health](#actuator-health)
-  - [API compatibility notes (2.0.2 / 3.9.0)](#api-compatibility-notes-202--390)
-  - [Quick run checklist](#quick-run-checklist)
+- [Version compatibility](#version-compatibility)
+- [SDO 3.0 on Boot 3.5](#sdo-30-on-boot-35)
+- [Duplicate `repositoryTagsProvider` bean](#duplicate-repositorytagsprovider-bean)
+- [Connection to `localhost:9200`](#connection-to-localhost9200)
+- [Local configuration (`local.env`)](#local-configuration-localenv)
+- [OpenSearch admin password strength](#opensearch-admin-password-strength)
+- [YAML passwords with `#`](#yaml-passwords-with-)
+- [Actuator health](#actuator-health)
+- [API compatibility (2.0.2 / 3.9.0)](#api-compatibility-202--390)
+- [Strict mapping / `_class` on save](#strict-mapping--_class-on-save)
+- [Quick run checklist](#quick-run-checklist)
 
 ## Version compatibility
 
 | Component | Working version | Notes |
 | --------- | --------------- | ----- |
 | Spring Boot | 3.5.14 | Parent in `pom.xml` |
-| Spring Data OpenSearch Starter | ### 2.0.2 | Matches Spring Boot 3.5.x |
+| Spring Data OpenSearch Starter | 2.0.2 | Matches Spring Boot 3.5.x |
 | OpenSearch Java Client | 3.9.0 | Direct client API |
 | OpenSearch Docker image | `opensearchproject/opensearch:3` | Currently 3.7.x |
 
-### Do not use `spring-data-opensearch` 3.0.x with Spring Boot 3.5. That line targets Spring Boot 4.x and pulls in `spring-boot-data-*` 4.x modules, which clash with Boot 3.5 auto-configuration.
+## SDO 3.0 on Boot 3.5
 
-## Startup failure: duplicate `repositoryTagsProvider` bean
+Do not use `spring-data-opensearch` **3.0.x** with Spring Boot **3.5**. That line targets Boot 4.x and pulls in `spring-boot-data-*` 4.x modules, which clash with Boot 3.5 auto-configuration.
 
-### Symptom
+See [upgrade.md](upgrade.md) for the Boot 4 migration path.
+
+## Duplicate `repositoryTagsProvider` bean
+
+**Symptom**
 
 ```none
 The bean 'repositoryTagsProvider' ... could not be registered.
@@ -47,25 +43,25 @@ A bean with that name has already been defined in
 RepositoryMetricsAutoConfiguration ... and overriding is disabled.
 ```
 
-### Cause
+**Cause**
 
 `spring-data-opensearch` 3.0.5 + `spring-boot-starter-actuator` on Spring Boot 3.5.14 registers the same metrics beans twice (Boot 3.5 Actuator vs Boot 4.x data modules).
 
-### Fix
+**Fix**
 
 Pin `spring-data-opensearch.version` to `2.0.2` in `pom.xml`.
 
-## Startup failure: connection to `http://localhost:9200`
+## Connection to `localhost:9200`
 
-### Symptom
+**Symptom**
 
 ```none
 Connect to http://localhost:9200 failed: Connection refused
 ```
 
-OpenSearch in this demo is only exposed on ### host port 443 (mapped to container 9200). Port 9200 is intentionally not published.
+OpenSearch in this demo is only exposed on host port **443** (mapped to container 9200). Port 9200 is intentionally not published.
 
-### Cause
+**Cause**
 
 Several auto-configurations compete to create the Spring Data client:
 
@@ -73,9 +69,9 @@ Several auto-configurations compete to create the Spring Data client:
 2. OpenSearch’s `OpenSearchRestHighLevelClientAutoConfiguration` (REST high-level client → port 9200)
 3. OpenSearch’s `OpenSearchClientAutoConfiguration` / `OpenSearchRestClientAutoConfiguration` (default REST transport)
 
-These can register an `elasticsearchOperations` / `elasticsearchTemplate` bean ### before the custom Java client, ignoring `https://localhost:443`.
+These can register an `elasticsearchOperations` / `elasticsearchTemplate` bean before the custom Java client, ignoring `https://localhost:443`.
 
-### Fix
+**Fix**
 
 Exclude conflicting auto-config in `OpenSearchDemoApplication`:
 
@@ -88,7 +84,7 @@ Exclude conflicting auto-config in `OpenSearchDemoApplication`:
 
 Provide a single `OpenSearchClient` in `OpenSearchClientConfig` that reads `OPENSEARCH_*` from the environment. Spring Data’s `OpenSearchDataConfiguration.JavaClientConfiguration` then uses that bean.
 
-## Local configuration: `local.env`
+## Local configuration (`local.env`)
 
 Connection settings live in `local.env` at the repo root:
 
@@ -99,7 +95,7 @@ Connection settings live in `local.env` at the repo root:
 | `OPENSEARCH_PASSWORD` | Admin password |
 | `OPENSEARCH_TRUST_SELF_SIGNED` | Trust local self-signed TLS (`true` for Docker demo) |
 
-### Always source before Compose, curl, or the app:
+Always `source local.env` before Compose, curl, or the app:
 
 ```bash
 source local.env
@@ -107,13 +103,13 @@ source local.env
 
 `make up`, `make run`, and `make health` source `local.env` automatically.
 
-`docker-compose.yml` uses `${OPENSEARCH_PASSWORD}` and `${OPENSEARCH_USERNAME}` with ### no defaults. Running `docker compose up` without sourcing `local.env` (or exporting those vars) passes empty values.
+`docker-compose.yml` uses `${OPENSEARCH_PASSWORD}` and `${OPENSEARCH_USERNAME}` with no defaults. Running `docker compose up` without sourcing `local.env` (or exporting those vars) passes empty values.
 
 If a stale `OPENSEARCH_PASSWORD` is exported in your shell (e.g. an old `Admin123!`), Compose interpolation uses the shell value, not `local.env`. Either `source local.env` in the same shell or `unset OPENSEARCH_PASSWORD` first.
 
 ## OpenSearch admin password strength
 
-### Symptom
+**Symptom**
 
 ```none
 Password Admin123! failed validation: "Weak password"
@@ -121,7 +117,7 @@ Password Admin123! failed validation: "Weak password"
 
 OpenSearch 3.7+ validates `OPENSEARCH_INITIAL_ADMIN_PASSWORD` with zxcvbn, not just character-class rules.
 
-### Fix
+**Fix**
 
 Use a stronger demo password in `local.env` (currently `Str0ng!Demo#9`). After changing the password, recycle the container and volume:
 
@@ -133,7 +129,7 @@ docker compose up -d
 
 `OPENSEARCH_INITIAL_ADMIN_PASSWORD` only applies on first cluster bootstrap; existing data volumes keep the old password.
 
-## YAML: quote passwords containing `#`
+## YAML passwords with `#`
 
 In `application.yml`, unquoted `#` starts a YAML comment:
 
@@ -155,7 +151,7 @@ http://localhost:8080/actuator/health
 
 Configured in `application.yml` with `show-details: always` for local debugging.
 
-## API compatibility notes (2.0.2 / 3.9.0)
+## API compatibility (2.0.2 / 3.9.0)
 
 When aligning code with the dependency set:
 
@@ -165,7 +161,7 @@ When aligning code with the dependency set:
 - `refreshInterval` expects `Time.of(t -> t.time("5s"))`, not a raw string.
 - HttpClient 5 no longer has `setSSLContext` on `HttpAsyncClientBuilder`; configure TLS via `PoolingAsyncClientConnectionManager` + `TlsStrategy`.
 
-## `strict_dynamic_mapping_exception` on save (`_class`)
+## Strict mapping / `_class` on save
 
 If `POST /api/products` returns 500 and the server log shows:
 
@@ -175,7 +171,7 @@ strict_dynamic_mapping_exception ... dynamic introduction of [_class] within [_d
 
 The index was created with **strict** dynamic mapping (java-client path), but Spring Data tried to index a `_class` type-hint field that is not in the mapping.
 
-Fix: on `ProductDocument`, use `@Document(..., writeTypeHint = WriteTypeHint.FALSE)` so saves only include mapped fields. `ProductDocument` already sets `@Dynamic(Dynamic.STRICT)` so Spring Data index creation matches the java-client path.
+**Fix:** on `ProductDocument`, use `@Document(..., writeTypeHint = WriteTypeHint.FALSE)` so saves only include mapped fields. Set `dynamic = Dynamic.STRICT` on `@Document` so Spring Data index creation matches the java-client path.
 
 ## Quick run checklist
 

@@ -10,6 +10,8 @@ Multi-module Maven project:
 
 DTO mapping conventions: [docs/mapping.md](docs/mapping.md)
 
+Upgrade path (Boot 3.5 → Boot 4 / SDO 3.0): [docs/upgrade.md](docs/upgrade.md)
+
 Build and run from the repo root:
 
 ```bash
