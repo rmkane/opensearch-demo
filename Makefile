@@ -16,7 +16,7 @@ export MAVEN_OPTS ?= --sun-misc-unsafe-memory-access=allow
 
 .PHONY: help develop verify build hooks \
         dev debug run jar prod \
-        test compile format lint verify install \
+        test test-integration compile format lint verify install \
         package build clean jar-path format-check \
         up down logs health \
         api-spring-index api-java-index api-recreate-java-index api-add-field api-refresh \
@@ -75,6 +75,10 @@ prod: jar
 ## test: Run unit tests
 test:
 	mvn test
+
+## test-integration: Run HTTP integration tests (app must be running on :8080)
+test-integration:
+	$(MVN) test -Pintegration
 
 ## compile: Compile main and test sources
 compile:

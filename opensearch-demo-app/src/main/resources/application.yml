@@ -3,12 +3,6 @@ server:
 
 app:
   base-url: ${APP_BASE_URL:}
-  # Explicit client config — bound by OpenSearchAutoConfiguration in opensearch-util.
-  opensearch:
-    uri: ${OPENSEARCH_URI}
-    username: ${OPENSEARCH_USERNAME}
-    password: "${OPENSEARCH_PASSWORD}"
-    trust-self-signed: ${OPENSEARCH_TRUST_SELF_SIGNED:true}
 
 management:
   endpoints:
@@ -18,10 +12,20 @@ management:
   endpoint:
     health:
       show-details: always
+  # disable elasticsearch actuator to avoid conflict with opensearch actuator
+  elasticsearch:
+    enabled: false
 
 spring:
   application:
     name: opensearch-demo
+  # Same shape as org.opensearch.spring.boot.autoconfigure.OpenSearchProperties.
+  # Starter auto-config is excluded; OpenSearchAutoConfiguration in opensearch-util binds these.
+  opensearch:
+    uris: ${OPENSEARCH_URI}
+    username: ${OPENSEARCH_USERNAME}
+    password: "${OPENSEARCH_PASSWORD}"
+    trust-self-signed: ${OPENSEARCH_TRUST_SELF_SIGNED:true}
 
 springdoc:
   swagger-ui:

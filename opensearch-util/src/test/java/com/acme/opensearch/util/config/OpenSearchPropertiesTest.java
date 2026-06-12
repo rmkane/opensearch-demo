@@ -9,16 +9,23 @@ import org.springframework.test.context.TestPropertySource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = OpenSearchPropertiesTest.Config.class)
-@TestPropertySource(properties = {"app.opensearch.uri=https://search.example:443", "app.opensearch.username=admin",
-		"app.opensearch.password=secret", "app.opensearch.trust-self-signed=false"})
+@TestPropertySource(properties = {
+		/* spotless:off */
+		"spring.opensearch.uris=https://search.example:443,https://search.example:444",
+		"spring.opensearch.username=admin",
+		"spring.opensearch.password=secret",
+		"spring.opensearch.trust-self-signed=false"
+		/* spotless:on */
+})
 class OpenSearchPropertiesTest {
 
 	@Autowired
 	private OpenSearchProperties properties;
 
 	@Test
-	void bindsAppOpenSearchProperties() {
-		assertThat(properties.uri()).isEqualTo("https://search.example:443");
+	void bindsSpringOpenSearchProperties() {
+		assertThat(properties.uris()).containsExactly("https://search.example:443", "https://search.example:444");
+		assertThat(properties.primaryUri()).isEqualTo("https://search.example:443");
 		assertThat(properties.username()).isEqualTo("admin");
 		assertThat(properties.password()).isEqualTo("secret");
 		assertThat(properties.trustSelfSigned()).isFalse();

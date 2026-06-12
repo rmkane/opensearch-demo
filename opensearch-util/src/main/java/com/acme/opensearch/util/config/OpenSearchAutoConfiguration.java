@@ -17,7 +17,7 @@ import com.acme.opensearch.util.health.OpenSearchHealthIndicator;
 
 /**
  * Registers a single {@link OpenSearchClient} and related beans from
- * {@code app.opensearch.*}. Import via Spring Boot auto-configuration or
+ * {@code spring.opensearch.*}. Import via Spring Boot auto-configuration or
  * {@code @Import(OpenSearchAutoConfiguration.class)}.
  */
 @Slf4j
@@ -28,8 +28,8 @@ public class OpenSearchAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public OpenSearchClient openSearchClient(OpenSearchProperties properties) {
-		log.info("Using OpenSearch URI: {}", properties.uri());
-		OpenSearchConnectionProperties connection = new OpenSearchConnectionProperties(properties.uri(),
+		log.info("Using OpenSearch URI: {} (spring.opensearch.uris)", properties.primaryUri());
+		OpenSearchConnectionProperties connection = new OpenSearchConnectionProperties(properties.primaryUri(),
 				properties.username(), properties.password(), properties.trustSelfSigned());
 		return OpenSearchClientFactory.create(connection);
 	}

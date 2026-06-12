@@ -73,7 +73,7 @@ mvn clean verify
 
 ## Step 2 — Auto-configuration exclusions (Boot 4)
 
-Boot 4 moves some Elasticsearch integration classes into new packages. This project excludes competing Elasticsearch/OpenSearch auto-config so a single `OpenSearchClient` bean is created from `app.opensearch.uri` (see `OpenSearchAutoConfiguration` in `opensearch-util`).
+Boot 4 moves some Elasticsearch integration classes into new packages. This project excludes competing Elasticsearch/OpenSearch auto-config so a single `OpenSearchClient` bean is created from `spring.opensearch.uris` (see `OpenSearchAutoConfiguration` in `opensearch-util`).
 
 **Boot 3.5 (today)** — `OpenSearchDemoApplication.java`:
 
@@ -159,11 +159,17 @@ make api-list
 make api-get ID=p-1
 ```
 
-Run integration tests (app must be running):
+Run integration tests (OpenSearch + app must be running):
 
 ```bash
-mvn -pl opensearch-demo-app test -Dgroups=integration
+mvn -pl opensearch-demo-app test -Pintegration
+
+# one class
+mvn -pl opensearch-demo-app test -Pintegration \
+  -Dtest=ProductSearchControllerIntegrationTest
 ```
+
+Or `make test-integration` from the repo root (requires `make dev` in another terminal).
 
 ## Step 7 — Optional: patch-level updates without Boot 4
 

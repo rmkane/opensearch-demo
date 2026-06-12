@@ -31,13 +31,17 @@ This is a minimal Spring Boot 3.5.x / Java 21 project that demonstrates:
 - updating index settings
 - Docker Compose mapping local host port `443` to OpenSearch container port `9200`
 
-Connection settings are bound via `app.opensearch` in `opensearch-util` (from `OPENSEARCH_*` in `local.env`):
+Connection settings use the standard `spring.opensearch` property shape (from `OPENSEARCH_*` in `local.env`):
 
 ```yaml
-app:
+spring:
   opensearch:
-    uri: https://localhost:443
+    uris: https://localhost:443
+    username: admin
+    password: "..."
 ```
+
+Starter auto-config is excluded; `OpenSearchAutoConfiguration` in `opensearch-util` binds these properties. `trust-self-signed` is a demo-only extension for local Docker TLS.
 
 The Docker Compose file exposes only:
 
@@ -161,12 +165,12 @@ If your application tries `https://localhost:9200`, you have reproduced the unwa
 
 ## Notes
 
-For AWS OpenSearch, set the explicit port in `local.env` or `app.opensearch.uri`:
+For AWS OpenSearch, set the explicit port in `local.env` or `spring.opensearch.uris`:
 
 ```yaml
-app:
+spring:
   opensearch:
-    uri: https://your-domain.region.es.amazonaws.com:443
+    uris: https://your-domain.region.es.amazonaws.com:443
 ```
 
 For production, do not use trust-all SSL. This sample trusts the local self-signed demo certificate only to simplify local development.

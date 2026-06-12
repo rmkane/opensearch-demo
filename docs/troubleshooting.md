@@ -83,18 +83,20 @@ Exclude conflicting auto-config in `OpenSearchDemoApplication`:
 - `OpenSearchRestClientAutoConfiguration`
 - `ReactiveOpenSearchClientAutoConfiguration`
 
-Provide a single `OpenSearchClient` via `OpenSearchAutoConfiguration` in `opensearch-util` (reads `app.opensearch.*` from `OPENSEARCH_*` env vars). Spring Data’s `OpenSearchDataConfiguration.JavaClientConfiguration` then uses that bean.
+Provide a single `OpenSearchClient` via `OpenSearchAutoConfiguration` in `opensearch-util` (reads `spring.opensearch.*` from env/`application.yml`). Spring Data’s `OpenSearchDataConfiguration.JavaClientConfiguration` then uses that bean.
+
+Property names match `org.opensearch.spring.boot.autoconfigure.OpenSearchProperties` (`uris`, `username`, `password`). Starter auto-config remains **excluded** — only the property shape is shared. `spring.opensearch.trust-self-signed` is a demo-only TLS extension.
 
 ## Local configuration (`local.env`)
 
-Connection settings live in `local.env` at the repo root:
+Connection settings live in `local.env` at the repo root and map into `spring.opensearch`:
 
-| Variable | Purpose |
-| -------- | ------- |
-| `OPENSEARCH_URI` | Cluster URL (`https://localhost:443`) |
-| `OPENSEARCH_USERNAME` | Admin username |
-| `OPENSEARCH_PASSWORD` | Admin password |
-| `OPENSEARCH_TRUST_SELF_SIGNED` | Trust local self-signed TLS (`true` for Docker demo) |
+| Variable | `spring.opensearch` property | Purpose |
+| -------- | -------------------------- | ------- |
+| `OPENSEARCH_URI` | `uris` | Cluster URL (`https://localhost:443`) |
+| `OPENSEARCH_USERNAME` | `username` | Admin username |
+| `OPENSEARCH_PASSWORD` | `password` | Admin password |
+| `OPENSEARCH_TRUST_SELF_SIGNED` | `trust-self-signed` | Demo-only: trust local self-signed TLS |
 
 Always `source local.env` before Compose, curl, or the app:
 

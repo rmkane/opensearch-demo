@@ -16,10 +16,10 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
  * Several Boot and OpenSearch auto-configurations compete to create a client
  * and default to {@code http://localhost:9200}. Excluding them lets
  * {@code OpenSearchAutoConfiguration} in {@code opensearch-util} supply a
- * single {@code OpenSearchClient} from {@code app.opensearch.uri} (typically
- * {@code https://localhost:443} via {@code OPENSEARCH_URI}). Spring Data's
- * {@code OpenSearchDataConfiguration.JavaClientConfiguration} then reuses that
- * bean. See {@code docs/troubleshooting.md} for details.
+ * single {@code OpenSearchClient} from {@code spring.opensearch.uris}
+ * (typically {@code https://localhost:443} via {@code OPENSEARCH_URI}). Spring
+ * Data's {@code OpenSearchDataConfiguration.JavaClientConfiguration} then
+ * reuses that bean. See {@code docs/troubleshooting.md} for details.
  */
 @SpringBootApplication(exclude = {
 		/* spotless:off */
