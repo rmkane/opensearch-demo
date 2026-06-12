@@ -3,8 +3,7 @@ package com.acme.opensearch.model;
 import lombok.experimental.UtilityClass;
 
 /**
- * Classpath location of shared index settings for
- * {@link ProductsIndex#INDEX_NAME}.
+ * Classpath location of shared index settings for {@link Product#INDEX_NAME}.
  */
 @UtilityClass
 public final class ProductsIndexSettings {

@@ -73,7 +73,7 @@ mvn clean verify
 
 ## Step 2 — Auto-configuration exclusions (Boot 4)
 
-Boot 4 moves some Elasticsearch integration classes into new packages. This project excludes competing Elasticsearch/OpenSearch auto-config so a single `OpenSearchClient` bean is created from `OPENSEARCH_URI` (see `OpenSearchClientConfig`).
+Boot 4 moves some Elasticsearch integration classes into new packages. This project excludes competing Elasticsearch/OpenSearch auto-config so a single `OpenSearchClient` bean is created from `app.opensearch.uri` (see `OpenSearchAutoConfiguration` in `opensearch-util`).
 
 **Boot 3.5 (today)** — `OpenSearchDemoApplication.java`:
 
@@ -120,7 +120,7 @@ Symptom: actuator health shows Elasticsearch down / connection refused on 9200.
 
 Fix: exclude Elasticsearch data and REST client auto-configuration (step 2). See [spring-data-opensearch#647](https://github.com/opensearch-project/spring-data-opensearch/issues/647).
 
-This demo also provides `OpenSearchHealthIndicator` for cluster health via the configured URI.
+This demo also provides `OpenSearchHealthIndicator` in `opensearch-util` for cluster health via the configured URI.
 
 ## Step 4 — Spring Data API notes (2.0.x → 3.0.x)
 
@@ -133,7 +133,7 @@ These conventions already apply on 2.0.2 and remain on 3.0.x:
 After upgrade, re-check:
 
 - `IndexOperations` / `createWithMapping()` for index creation.
-- `ProductDocument` annotations: `@Document`, `@Setting`, `writeTypeHint = WriteTypeHint.FALSE`, `dynamic = Dynamic.STRICT` (see `docs/troubleshooting.md`).
+- `Product` annotations: `@Document`, `@Setting`, `writeTypeHint = WriteTypeHint.FALSE`, `dynamic = Dynamic.STRICT` (see `docs/troubleshooting.md`).
 
 ## Step 5 — springdoc (2.x → 3.x)
 

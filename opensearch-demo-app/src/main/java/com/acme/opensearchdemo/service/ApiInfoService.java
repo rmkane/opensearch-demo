@@ -1,6 +1,6 @@
 package com.acme.opensearchdemo.service;
 
-import com.acme.opensearch.model.ApiInfo;
+import com.acme.opensearchdemo.model.ApiInfo;
 
 public interface ApiInfoService {
 

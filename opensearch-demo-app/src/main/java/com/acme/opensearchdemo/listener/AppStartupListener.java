@@ -8,8 +8,7 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.acme.opensearch.model.ApiInfo;
-
+import com.acme.opensearchdemo.model.ApiInfo;
 import com.acme.opensearchdemo.service.ApiInfoService;
 
 @Component

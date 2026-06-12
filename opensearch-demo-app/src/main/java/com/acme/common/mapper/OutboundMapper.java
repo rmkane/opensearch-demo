@@ -16,7 +16,7 @@ import org.springframework.util.CollectionUtils;
  * Compare with {@link Mapper} for bidirectional mapping (request + response).
  *
  * @param <E>
- *            source type (e.g. {@code ProductDocument})
+ *            source type (e.g. {@code Product})
  * @param <D>
  *            API DTO type (e.g. {@code ProductResponse})
  * @see AbstractOutboundMapperImpl

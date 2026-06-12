@@ -4,19 +4,20 @@ import org.springframework.stereotype.Component;
 
 import com.acme.common.mapper.AbstractOutboundMapperImpl;
 
+import com.acme.opensearch.model.Product;
+
 import com.acme.opensearchdemo.dto.ProductResponse;
-import com.acme.opensearchdemo.model.ProductDocument;
 
 /**
- * Maps {@link ProductDocument} to {@link ProductResponse} for HTTP responses.
- * Response-only; request bodies still deserialize to {@code ProductDocument}
- * until a {@code ProductRequest} DTO exists.
+ * Maps {@link Product} to {@link ProductResponse} for HTTP responses.
+ * Response-only; request bodies still deserialize to {@code Product} until a
+ * {@code ProductRequest} DTO exists.
  */
 @Component
-public class ProductResponseMapper extends AbstractOutboundMapperImpl<ProductDocument, ProductResponse> {
+public class ProductResponseMapper extends AbstractOutboundMapperImpl<Product, ProductResponse> {
 
 	@Override
-	public ProductResponse toDto(ProductDocument entity) {
+	public ProductResponse toDto(Product entity) {
 		/* spotless:off */
 		return ProductResponse.builder()
 				.id(entity.id())

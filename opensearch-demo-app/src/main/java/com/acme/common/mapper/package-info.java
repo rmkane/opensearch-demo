@@ -5,7 +5,7 @@
  *
  * <pre>
  *   HTTP JSON  &lt;-&gt;  ProductResponse (dto)     &lt;-- OutboundMapper in controller
- *   ProductDocument (persistence)               &lt;-- service / repository
+ *   Product (domain + persistence)            &lt;-- service / repository
  *   Product (opensearch-model)                  &lt;-- optional shared domain type
  * </pre>
  *

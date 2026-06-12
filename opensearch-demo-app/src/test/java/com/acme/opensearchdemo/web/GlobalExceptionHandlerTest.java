@@ -5,9 +5,11 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,6 +29,14 @@ class GlobalExceptionHandlerTest {
 
 		assertThat(problem.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 		assertThat(problem.getDetail()).contains("purge");
+	}
+
+	@Test
+	void handleNoResourceFoundForFavicon() {
+		ProblemDetail problem = handler
+				.handleNoResourceFound(new NoResourceFoundException(HttpMethod.GET, "favicon.ico"));
+
+		assertThat(problem.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
 	}
 
 	@Test

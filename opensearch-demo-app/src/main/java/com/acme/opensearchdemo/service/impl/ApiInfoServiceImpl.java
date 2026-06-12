@@ -4,8 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.acme.opensearch.model.ApiInfo;
-
+import com.acme.opensearchdemo.model.ApiInfo;
 import com.acme.opensearchdemo.service.ApiInfoService;
 
 @Service

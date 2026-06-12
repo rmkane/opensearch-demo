@@ -15,7 +15,7 @@ import org.opensearch.client.opensearch.indices.PutMappingResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.acme.opensearch.model.ProductsIndex;
+import com.acme.opensearch.model.Product;
 
 /**
  * Index lifecycle operations via {@code opensearch-java} (no Spring
@@ -32,20 +32,20 @@ public class ProductIndexOperations {
 
 	public Map<String, Object> createIfAbsent() throws IOException {
 		if (indexExists()) {
-			log.warn("Index '{}' already exists; skipping opensearch-java create", ProductsIndex.INDEX_NAME);
+			log.warn("Index '{}' already exists; skipping opensearch-java create", Product.INDEX_NAME);
 			/* spotless:off */
 			return Map.ofEntries(
 				Map.entry("created", false),
-				Map.entry("index", ProductsIndex.INDEX_NAME),
+				Map.entry("index", Product.INDEX_NAME),
 				Map.entry("message", "Index already exists")
 			);
 			/* spotless:on */
 		}
 
 		ProductsIndexSettingsSupport.Values indexSettings = ProductsIndexSettingsSupport.load();
-		log.info("Creating index '{}' via opensearch-java client", ProductsIndex.INDEX_NAME);
+		log.info("Creating index '{}' via opensearch-java client", Product.INDEX_NAME);
 		CreateIndexResponse response = client.indices()
-				.create(request -> request.index(ProductsIndex.INDEX_NAME)
+				.create(request -> request.index(Product.INDEX_NAME)
 						.settings(settings -> settings.numberOfShards(indexSettings.numberOfShards())
 								.numberOfReplicas(indexSettings.numberOfReplicas())
 								.refreshInterval(Time.of(t -> t.time(indexSettings.refreshInterval()))))
@@ -57,12 +57,12 @@ public class ProductIndexOperations {
 								.properties("price", property -> property.double_(number -> number))
 								.properties("updatedOn", property -> property.date(date -> date))));
 
-		log.info("Created index '{}' via opensearch-java client (acknowledged={})", ProductsIndex.INDEX_NAME,
+		log.info("Created index '{}' via opensearch-java client (acknowledged={})", Product.INDEX_NAME,
 				response.acknowledged());
 		/* spotless:off */
 		return Map.ofEntries(
 			Map.entry("created", response.acknowledged()),
-			Map.entry("index", ProductsIndex.INDEX_NAME),
+			Map.entry("index", Product.INDEX_NAME),
 			Map.entry("client", "opensearch-java")
 		);
 		/* spotless:on */
@@ -70,15 +70,14 @@ public class ProductIndexOperations {
 
 	public Map<String, Object> recreate() throws IOException {
 		if (indexExists()) {
-			log.info("Deleting index '{}' before opensearch-java recreate", ProductsIndex.INDEX_NAME);
-			DeleteIndexResponse deleteResponse = client.indices()
-					.delete(request -> request.index(ProductsIndex.INDEX_NAME));
+			log.info("Deleting index '{}' before opensearch-java recreate", Product.INDEX_NAME);
+			DeleteIndexResponse deleteResponse = client.indices().delete(request -> request.index(Product.INDEX_NAME));
 			if (!deleteResponse.acknowledged()) {
-				log.warn("Delete of index '{}' was not acknowledged", ProductsIndex.INDEX_NAME);
+				log.warn("Delete of index '{}' was not acknowledged", Product.INDEX_NAME);
 				/* spotless:off */
 				return Map.ofEntries(
 					Map.entry("recreated", false),
-					Map.entry("index", ProductsIndex.INDEX_NAME),
+					Map.entry("index", Product.INDEX_NAME),
 					Map.entry("message", "Delete was not acknowledged")
 				);
 				/* spotless:on */
@@ -89,40 +88,39 @@ public class ProductIndexOperations {
 	}
 
 	public Map<String, Object> addDescriptionField() throws IOException {
-		log.info("Adding 'description' field to index '{}' mapping", ProductsIndex.INDEX_NAME);
-		PutMappingResponse response = client.indices().putMapping(request -> request.index(ProductsIndex.INDEX_NAME)
+		log.info("Adding 'description' field to index '{}' mapping", Product.INDEX_NAME);
+		PutMappingResponse response = client.indices().putMapping(request -> request.index(Product.INDEX_NAME)
 				.properties("description", property -> property.text(text -> text)));
 
-		log.info("Updated index '{}' mapping (acknowledged={})", ProductsIndex.INDEX_NAME, response.acknowledged());
+		log.info("Updated index '{}' mapping (acknowledged={})", Product.INDEX_NAME, response.acknowledged());
 		/* spotless:off */
 		return Map.ofEntries(
 			Map.entry("acknowledged", response.acknowledged()),
-			Map.entry("index", ProductsIndex.INDEX_NAME),
+			Map.entry("index", Product.INDEX_NAME),
 			Map.entry("addedField", "description")
 		);
 		/* spotless:on */
 	}
 
 	public Map<String, Object> updateRefreshInterval(String refreshInterval) throws IOException {
-		log.info("Updating refresh_interval for index '{}' to {}", ProductsIndex.INDEX_NAME, refreshInterval);
+		log.info("Updating refresh_interval for index '{}' to {}", Product.INDEX_NAME, refreshInterval);
 		// refreshInterval expects Time.of(t -> t.time("5s")), not a raw string
 		// (opensearch-java 3.x).
-		PutIndicesSettingsResponse response = client.indices()
-				.putSettings(request -> request.index(ProductsIndex.INDEX_NAME)
-						.settings(settings -> settings.refreshInterval(Time.of(t -> t.time(refreshInterval)))));
+		PutIndicesSettingsResponse response = client.indices().putSettings(request -> request.index(Product.INDEX_NAME)
+				.settings(settings -> settings.refreshInterval(Time.of(t -> t.time(refreshInterval)))));
 
-		log.info("Updated index '{}' settings (acknowledged={})", ProductsIndex.INDEX_NAME, response.acknowledged());
+		log.info("Updated index '{}' settings (acknowledged={})", Product.INDEX_NAME, response.acknowledged());
 		/* spotless:off */
 		return Map.ofEntries(
 			Map.entry("acknowledged", response.acknowledged()),
-			Map.entry("index", ProductsIndex.INDEX_NAME),
+			Map.entry("index", Product.INDEX_NAME),
 			Map.entry("refreshInterval", refreshInterval)
 		);
 		/* spotless:on */
 	}
 
 	private boolean indexExists() throws IOException {
-		ExistsRequest request = ExistsRequest.of(builder -> builder.index(ProductsIndex.INDEX_NAME));
+		ExistsRequest request = ExistsRequest.of(builder -> builder.index(Product.INDEX_NAME));
 		return client.indices().exists(request).value();
 	}
 }

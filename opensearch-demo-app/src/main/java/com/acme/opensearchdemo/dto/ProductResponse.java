@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * API representation of a product returned by {@code /api/products} endpoints.
- * Mapped from {@link com.acme.opensearchdemo.model.ProductDocument} via
+ * Mapped from {@link com.acme.opensearch.model.Product} via
  * {@link com.acme.opensearchdemo.mapper.ProductResponseMapper}.
  */
 @Data

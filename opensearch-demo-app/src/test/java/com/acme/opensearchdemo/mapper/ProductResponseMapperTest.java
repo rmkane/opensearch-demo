@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.acme.opensearchdemo.model.ProductDocument;
+import com.acme.opensearch.model.Product;
 
 class ProductResponseMapperTest {
 
@@ -16,8 +16,7 @@ class ProductResponseMapperTest {
 	@Test
 	void mapsAllFields() {
 		Instant updatedOn = Instant.parse("2026-06-10T12:00:00Z");
-		ProductDocument document = new ProductDocument("p-1", "Coffee Mug", "MUG-001", new BigDecimal("12.99"),
-				updatedOn);
+		Product document = new Product("p-1", "Coffee Mug", "MUG-001", new BigDecimal("12.99"), updatedOn);
 
 		var response = mapper.toDto(document);
 
@@ -35,7 +34,7 @@ class ProductResponseMapperTest {
 
 	@Test
 	void toDtoListSkipsNullElements() {
-		ProductDocument document = new ProductDocument("p-1", "Coffee Mug", "MUG-001", BigDecimal.ONE, null);
+		Product document = new Product("p-1", "Coffee Mug", "MUG-001", BigDecimal.ONE, null);
 
 		assertThat(mapper.toDtoList(java.util.Arrays.asList(document, null))).hasSize(1);
 	}

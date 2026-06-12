@@ -25,11 +25,10 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-import com.acme.opensearch.model.ProductsIndex;
+import com.acme.opensearch.model.Product;
 
 import com.acme.opensearchdemo.dto.ProductResponse;
 import com.acme.opensearchdemo.mapper.ProductResponseMapper;
-import com.acme.opensearchdemo.model.ProductDocument;
 import com.acme.opensearchdemo.service.ProductSearchService;
 
 /**
@@ -85,7 +84,7 @@ public class ProductSearchController {
 
 	@Operation(summary = "Create or update a product", description = """
 			Persists a product to the OpenSearch products index. \
-			Provide id, name, sku, and price; updatedOn is assigned by the server.""", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductDocument.class), examples = @ExampleObject(name = "sampleProduct", summary = "Coffee mug", value = """
+			Provide id, name, sku, and price; updatedOn is assigned by the server.""", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class), examples = @ExampleObject(name = "sampleProduct", summary = "Coffee mug", value = """
 			{
 			  "id": "p-1",
 			  "name": "Coffee Mug",
@@ -95,12 +94,12 @@ public class ProductSearchController {
 			"""))))
 	@ApiResponse(responseCode = "200", description = "Saved product", content = @Content(schema = @Schema(implementation = ProductResponse.class)))
 	@PostMapping
-	public ResponseEntity<ProductResponse> save(@RequestBody ProductDocument document) {
+	public ResponseEntity<ProductResponse> save(@RequestBody Product document) {
 		return ResponseEntity.ok(productResponseMapper.toDto(service.save(document)));
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<ProductResponse> replace(@PathVariable String id, @RequestBody ProductDocument document) {
+	public ResponseEntity<ProductResponse> replace(@PathVariable String id, @RequestBody Product document) {
 		/* spotless:off */
 		return service.replace(id, document)
 				.map(productResponseMapper::toDto)
@@ -110,7 +109,7 @@ public class ProductSearchController {
 	}
 
 	@PatchMapping("/{id}")
-	public ResponseEntity<ProductResponse> update(@PathVariable String id, @RequestBody ProductDocument patch) {
+	public ResponseEntity<ProductResponse> update(@PathVariable String id, @RequestBody Product patch) {
 		/* spotless:off */
 		return service.update(id, patch)
 				.map(productResponseMapper::toDto)
@@ -145,7 +144,7 @@ public class ProductSearchController {
 		/* spotless:off */
 		return ResponseEntity.ok(Map.ofEntries(
 			Map.entry("purged", true),
-			Map.entry("index", ProductsIndex.INDEX_NAME),
+			Map.entry("index", Product.INDEX_NAME),
 			Map.entry("deleted", deleted)
 		));
 		/* spotless:on */

@@ -83,7 +83,7 @@ Exclude conflicting auto-config in `OpenSearchDemoApplication`:
 - `OpenSearchRestClientAutoConfiguration`
 - `ReactiveOpenSearchClientAutoConfiguration`
 
-Provide a single `OpenSearchClient` in `OpenSearchClientConfig` that reads `OPENSEARCH_*` from the environment. Spring Data’s `OpenSearchDataConfiguration.JavaClientConfiguration` then uses that bean.
+Provide a single `OpenSearchClient` via `OpenSearchAutoConfiguration` in `opensearch-util` (reads `app.opensearch.*` from `OPENSEARCH_*` env vars). Spring Data’s `OpenSearchDataConfiguration.JavaClientConfiguration` then uses that bean.
 
 ## Local configuration (`local.env`)
 
@@ -172,7 +172,7 @@ strict_dynamic_mapping_exception ... dynamic introduction of [_class] within [_d
 
 The index was created with **strict** dynamic mapping (java-client path), but Spring Data tried to index a `_class` type-hint field that is not in the mapping.
 
-**Fix:** on `ProductDocument`, use `@Document(..., writeTypeHint = WriteTypeHint.FALSE)` so saves only include mapped fields. Set `dynamic = Dynamic.STRICT` on `@Document` so Spring Data index creation matches the java-client path.
+**Fix:** on `Product`, use `@Document(..., writeTypeHint = WriteTypeHint.FALSE)` so saves only include mapped fields. Set `dynamic = Dynamic.STRICT` on `@Document` so Spring Data index creation matches the java-client path.
 
 ## Strict mapping / missing `id` after `make down`
 

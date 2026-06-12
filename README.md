@@ -4,8 +4,8 @@ Multi-module Maven project:
 
 | Module | Purpose |
 | ------ | ------- |
-| `opensearch-model` | Shared domain types (`Product`, `ProductsIndex`, `ApiInfo`) |
-| `opensearch-util` | Framework-free OpenSearch helpers (`OpenSearchClientFactory`, `ProductIndexOperations`) |
+| `opensearch-model` | Domain types and Spring Data entity (`Product`), repository (`ProductRepository`), index settings |
+| `opensearch-util` | Java client factory, index operations, Spring auto-config (`OpenSearchAutoConfiguration`), actuator health |
 | `opensearch-demo-app` | Spring Boot demo app and HTTP API |
 
 DTO mapping conventions: [docs/mapping.md](docs/mapping.md)
@@ -31,12 +31,12 @@ This is a minimal Spring Boot 3.5.x / Java 21 project that demonstrates:
 - updating index settings
 - Docker Compose mapping local host port `443` to OpenSearch container port `9200`
 
-The local OpenSearch URL is intentionally:
+Connection settings are bound via `app.opensearch` in `opensearch-util` (from `OPENSEARCH_*` in `local.env`):
 
 ```yaml
-spring:
+app:
   opensearch:
-    uris: https://localhost:443
+    uri: https://localhost:443
 ```
 
 The Docker Compose file exposes only:
@@ -161,12 +161,12 @@ If your application tries `https://localhost:9200`, you have reproduced the unwa
 
 ## Notes
 
-For AWS OpenSearch, use the explicit port:
+For AWS OpenSearch, set the explicit port in `local.env` or `app.opensearch.uri`:
 
 ```yaml
-spring:
+app:
   opensearch:
-    uris: https://your-domain.region.es.amazonaws.com:443
+    uri: https://your-domain.region.es.amazonaws.com:443
 ```
 
 For production, do not use trust-all SSL. This sample trusts the local self-signed demo certificate only to simplify local development.

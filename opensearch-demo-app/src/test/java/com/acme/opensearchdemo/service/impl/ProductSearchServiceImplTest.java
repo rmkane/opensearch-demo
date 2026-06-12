@@ -20,10 +20,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.acme.opensearch.model.Product;
+import com.acme.opensearch.repository.ProductRepository;
 import com.acme.opensearch.util.ProductIndexOperations;
-
-import com.acme.opensearchdemo.model.ProductDocument;
-import com.acme.opensearchdemo.repository.ProductRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ProductSearchServiceImplTest {
@@ -42,35 +41,35 @@ class ProductSearchServiceImplTest {
 
 	@Test
 	void saveNormalizesNullPriceAndSetsUpdatedOn() {
-		when(repository.save(any(ProductDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
+		when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-		ProductDocument saved = service.save(new ProductDocument("p-1", "Coffee Mug", "MUG-001", null, null));
+		Product saved = service.save(new Product("p-1", "Coffee Mug", "MUG-001", null, null));
 
 		assertThat(saved.price()).isEqualByComparingTo(BigDecimal.ZERO);
 		assertThat(saved.updatedOn()).isNotNull();
-		verify(repository).save(any(ProductDocument.class));
+		verify(repository).save(any(Product.class));
 	}
 
 	@Test
 	void replaceUpdatesExistingProduct() {
-		ProductDocument existing = new ProductDocument("p-1", "Coffee Mug", "MUG-001", BigDecimal.TEN, null);
+		Product existing = new Product("p-1", "Coffee Mug", "MUG-001", BigDecimal.TEN, null);
 		when(repository.existsById("p-1")).thenReturn(true);
-		when(repository.save(any(ProductDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
+		when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-		Optional<ProductDocument> replaced = service.replace("p-1",
-				new ProductDocument(null, "Large Mug", "MUG-001", new BigDecimal("14.99"), null));
+		Optional<Product> replaced = service.replace("p-1",
+				new Product(null, "Large Mug", "MUG-001", new BigDecimal("14.99"), null));
 
 		assertThat(replaced).isPresent();
 		assertThat(replaced.orElseThrow().id()).isEqualTo("p-1");
 		assertThat(replaced.orElseThrow().name()).isEqualTo("Large Mug");
-		verify(repository).save(any(ProductDocument.class));
+		verify(repository).save(any(Product.class));
 	}
 
 	@Test
 	void replaceReturnsEmptyWhenMissing() {
 		when(repository.existsById("missing")).thenReturn(false);
 
-		assertThat(service.replace("missing", new ProductDocument(null, "Large Mug", "MUG-001", BigDecimal.ONE, null)))
+		assertThat(service.replace("missing", new Product(null, "Large Mug", "MUG-001", BigDecimal.ONE, null)))
 				.isEmpty();
 		verify(repository, never()).save(any());
 	}
@@ -78,18 +77,17 @@ class ProductSearchServiceImplTest {
 	@Test
 	void replaceRejectsMismatchedId() {
 		assertThatThrownBy(
-				() -> service.replace("p-1", new ProductDocument("p-2", "Large Mug", "MUG-001", BigDecimal.ONE, null)))
+				() -> service.replace("p-1", new Product("p-2", "Large Mug", "MUG-001", BigDecimal.ONE, null)))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("ID in body does not match path");
 	}
 
 	@Test
 	void updatePatchesExistingFields() {
-		ProductDocument existing = new ProductDocument("p-1", "Coffee Mug", "MUG-001", BigDecimal.TEN, null);
+		Product existing = new Product("p-1", "Coffee Mug", "MUG-001", BigDecimal.TEN, null);
 		when(repository.findById("p-1")).thenReturn(Optional.of(existing));
-		when(repository.save(any(ProductDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
+		when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-		Optional<ProductDocument> updated = service.update("p-1",
-				new ProductDocument(null, null, null, new BigDecimal("9.99"), null));
+		Optional<Product> updated = service.update("p-1", new Product(null, null, null, new BigDecimal("9.99"), null));
 
 		assertThat(updated).isPresent();
 		assertThat(updated.orElseThrow().name()).isEqualTo("Coffee Mug");
@@ -100,7 +98,7 @@ class ProductSearchServiceImplTest {
 	void updateReturnsEmptyWhenMissing() {
 		when(repository.findById("missing")).thenReturn(Optional.empty());
 
-		assertThat(service.update("missing", new ProductDocument(null, null, null, BigDecimal.ONE, null))).isEmpty();
+		assertThat(service.update("missing", new Product(null, null, null, BigDecimal.ONE, null))).isEmpty();
 	}
 
 	@Test
@@ -129,7 +127,7 @@ class ProductSearchServiceImplTest {
 
 	@Test
 	void findByIdDelegatesToRepository() {
-		ProductDocument document = new ProductDocument("p-1", "Coffee Mug", "MUG-001", BigDecimal.TEN, null);
+		Product document = new Product("p-1", "Coffee Mug", "MUG-001", BigDecimal.TEN, null);
 		when(repository.findById("p-1")).thenReturn(Optional.of(document));
 
 		assertThat(service.findById("p-1")).contains(document);
@@ -137,8 +135,7 @@ class ProductSearchServiceImplTest {
 
 	@Test
 	void findAllDelegatesToRepository() {
-		List<ProductDocument> documents = List
-				.of(new ProductDocument("p-1", "Coffee Mug", "MUG-001", BigDecimal.TEN, null));
+		List<Product> documents = List.of(new Product("p-1", "Coffee Mug", "MUG-001", BigDecimal.TEN, null));
 		when(repository.findAll()).thenReturn(documents);
 
 		assertThat(service.findAll()).containsExactlyElementsOf(documents);

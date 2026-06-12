@@ -10,10 +10,10 @@ package com.acme.common.mapper;
  * <pre>
  * {@code
  * &#64;Component
- * public class ProductResponseMapper extends AbstractOutboundMapperImpl<ProductDocument, ProductResponse> {
+ * public class ProductResponseMapper extends AbstractOutboundMapperImpl<Product, ProductResponse> {
  *
  * 	&#64;Override
- * 	public ProductResponse toDto(ProductDocument entity) {
+ * 	public ProductResponse toDto(Product entity) {
  * 		return ProductResponse.builder().id(entity.id())...build();
  * 	}
  * }

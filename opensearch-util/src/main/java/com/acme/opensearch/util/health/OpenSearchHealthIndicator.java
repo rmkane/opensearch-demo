@@ -1,21 +1,19 @@
-package com.acme.opensearchdemo.config;
+package com.acme.opensearch.util.health;
 
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.HealthStatus;
 import org.opensearch.client.opensearch.cluster.HealthResponse;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
-import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Actuator health for the {@link OpenSearchClient} configured in
- * {@link OpenSearchClientConfig}.
+ * {@link com.acme.opensearch.util.config.OpenSearchAutoConfiguration}.
  */
 @Slf4j
-@Component("opensearch")
 @RequiredArgsConstructor
 public class OpenSearchHealthIndicator implements HealthIndicator {
 

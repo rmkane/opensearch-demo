@@ -18,7 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.acme.opensearchdemo.model.ProductDocument;
+import com.acme.opensearch.model.Product;
 
 @Tag("integration")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -40,7 +40,7 @@ class ProductSearchControllerIntegrationTest extends BaseIntegrationTest {
 	@Test
 	@Order(2)
 	void shouldCreateProduct() {
-		ProductDocument product = new ProductDocument("p-1", "Coffee Mug", "MUG-001", new BigDecimal("12.99"), null);
+		Product product = new Product("p-1", "Coffee Mug", "MUG-001", new BigDecimal("12.99"), null);
 		ResponseEntity<String> response = restTemplate.exchange(apiUrl(BASE_URL), HttpMethod.POST, jsonEntity(product),
 				String.class);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -68,8 +68,7 @@ class ProductSearchControllerIntegrationTest extends BaseIntegrationTest {
 	@Test
 	@Order(5)
 	void shouldUpdateProduct() {
-		ProductDocument product = new ProductDocument(null, "Large Coffee Mug", "MUG-001", new BigDecimal("14.99"),
-				null);
+		Product product = new Product(null, "Large Coffee Mug", "MUG-001", new BigDecimal("14.99"), null);
 		ResponseEntity<String> response = restTemplate.exchange(apiUrl(BASE_URL + "/{id}"), HttpMethod.PUT,
 				jsonEntity(product), String.class, "p-1");
 		assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -87,8 +86,7 @@ class ProductSearchControllerIntegrationTest extends BaseIntegrationTest {
 	@Test
 	@Order(7)
 	void shouldPurgeAllProducts() throws JsonProcessingException {
-		ProductDocument product = new ProductDocument("p-purge", "Purge Test", "PURGE-001", new BigDecimal("1.00"),
-				null);
+		Product product = new Product("p-purge", "Purge Test", "PURGE-001", new BigDecimal("1.00"), null);
 		restTemplate.exchange(apiUrl(BASE_URL), HttpMethod.POST, jsonEntity(product), String.class);
 
 		ResponseEntity<String> response = restTemplate.exchange(apiUrl(BASE_URL + "?purge=true"), HttpMethod.DELETE,

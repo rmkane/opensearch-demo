@@ -10,8 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Hidden;
 
-import com.acme.opensearch.model.ApiInfo;
-
+import com.acme.opensearchdemo.model.ApiInfo;
 import com.acme.opensearchdemo.service.ApiInfoService;
 
 @Hidden

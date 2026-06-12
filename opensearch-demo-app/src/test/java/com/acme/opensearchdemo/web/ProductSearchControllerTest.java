@@ -26,8 +26,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.acme.opensearch.model.Product;
+
 import com.acme.opensearchdemo.mapper.ProductResponseMapper;
-import com.acme.opensearchdemo.model.ProductDocument;
 import com.acme.opensearchdemo.service.ProductSearchService;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,7 +49,7 @@ class ProductSearchControllerTest {
 
 	@Test
 	void findByIdReturnsProduct() throws Exception {
-		ProductDocument document = new ProductDocument("p-1", "Coffee Mug", "MUG-001", new BigDecimal("12.99"), null);
+		Product document = new Product("p-1", "Coffee Mug", "MUG-001", new BigDecimal("12.99"), null);
 		when(service.findById("p-1")).thenReturn(Optional.of(document));
 
 		mockMvc.perform(get("/api/products/p-1").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
@@ -65,7 +66,7 @@ class ProductSearchControllerTest {
 
 	@Test
 	void findAllReturnsProducts() throws Exception {
-		ProductDocument document = new ProductDocument("p-1", "Coffee Mug", "MUG-001", new BigDecimal("12.99"), null);
+		Product document = new Product("p-1", "Coffee Mug", "MUG-001", new BigDecimal("12.99"), null);
 		when(service.findAll()).thenReturn(List.of(document));
 
 		mockMvc.perform(get("/api/products").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
@@ -74,8 +75,8 @@ class ProductSearchControllerTest {
 
 	@Test
 	void replaceReturnsUpdatedProduct() throws Exception {
-		ProductDocument replaced = new ProductDocument("p-1", "Large Mug", "MUG-001", new BigDecimal("14.99"), null);
-		when(service.replace(eq("p-1"), any(ProductDocument.class))).thenReturn(Optional.of(replaced));
+		Product replaced = new Product("p-1", "Large Mug", "MUG-001", new BigDecimal("14.99"), null);
+		when(service.replace(eq("p-1"), any(Product.class))).thenReturn(Optional.of(replaced));
 
 		mockMvc.perform(put("/api/products/p-1").contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON).content("""
@@ -85,7 +86,7 @@ class ProductSearchControllerTest {
 
 	@Test
 	void replaceReturns404WhenMissing() throws Exception {
-		when(service.replace(eq("missing"), any(ProductDocument.class))).thenReturn(Optional.empty());
+		when(service.replace(eq("missing"), any(Product.class))).thenReturn(Optional.empty());
 
 		mockMvc.perform(put("/api/products/missing").contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON).content("""
@@ -95,7 +96,7 @@ class ProductSearchControllerTest {
 
 	@Test
 	void replaceReturns400WhenIdMismatches() throws Exception {
-		when(service.replace(eq("p-1"), any(ProductDocument.class)))
+		when(service.replace(eq("p-1"), any(Product.class)))
 				.thenThrow(new IllegalArgumentException("ID in body does not match path"));
 
 		mockMvc.perform(put("/api/products/p-1").contentType(MediaType.APPLICATION_JSON)
@@ -107,8 +108,8 @@ class ProductSearchControllerTest {
 
 	@Test
 	void patchReturnsUpdatedProduct() throws Exception {
-		ProductDocument patched = new ProductDocument("p-1", "Coffee Mug", "MUG-001", new BigDecimal("9.99"), null);
-		when(service.update(eq("p-1"), any(ProductDocument.class))).thenReturn(Optional.of(patched));
+		Product patched = new Product("p-1", "Coffee Mug", "MUG-001", new BigDecimal("9.99"), null);
+		when(service.update(eq("p-1"), any(Product.class))).thenReturn(Optional.of(patched));
 
 		mockMvc.perform(patch("/api/products/p-1").contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON).content("""
@@ -118,7 +119,7 @@ class ProductSearchControllerTest {
 
 	@Test
 	void patchReturns404WhenMissing() throws Exception {
-		when(service.update(eq("missing"), any(ProductDocument.class))).thenReturn(Optional.empty());
+		when(service.update(eq("missing"), any(Product.class))).thenReturn(Optional.empty());
 
 		mockMvc.perform(patch("/api/products/missing").contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON).content("""
@@ -158,8 +159,8 @@ class ProductSearchControllerTest {
 
 	@Test
 	void saveReturnsPersistedProduct() throws Exception {
-		ProductDocument saved = new ProductDocument("p-1", "Coffee Mug", "MUG-001", new BigDecimal("12.99"), null);
-		when(service.save(any(ProductDocument.class))).thenReturn(saved);
+		Product saved = new Product("p-1", "Coffee Mug", "MUG-001", new BigDecimal("12.99"), null);
+		when(service.save(any(Product.class))).thenReturn(saved);
 
 		mockMvc.perform(post("/api/products").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
 				.content("""

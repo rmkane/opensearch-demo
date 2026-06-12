@@ -18,7 +18,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 public abstract class BaseIntegrationTest {
 
-	protected static final String SERVER_BASE = System.getenv().getOrDefault("API_BASE", "http://localhost:8080");
+	protected static final String SERVER_PORT = System.getenv().getOrDefault("SERVER_PORT", "8080");
+	protected static final String SERVER_BASE = System.getenv().getOrDefault("SERVER_BASE",
+			"http://localhost:" + SERVER_PORT);
 
 	protected final RestTemplate restTemplate = new RestTemplate();
 

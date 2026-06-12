@@ -7,13 +7,13 @@ import java.io.UncheckedIOException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.acme.opensearch.model.ProductsIndex;
+import com.acme.opensearch.model.Product;
 import com.acme.opensearch.model.ProductsIndexSettings;
 
 /**
  * Loads {@link ProductsIndexSettings#SETTINGS_PATH} for the opensearch-java
  * client. Spring Data reads the same file via {@code @Setting} on
- * {@code ProductDocument}.
+ * {@code Product}.
  */
 public final class ProductsIndexSettingsSupport {
 
@@ -26,7 +26,7 @@ public final class ProductsIndexSettingsSupport {
 	}
 
 	public static Values load() {
-		try (InputStream in = ProductsIndex.class.getResourceAsStream(ProductsIndexSettings.SETTINGS_PATH)) {
+		try (InputStream in = Product.class.getResourceAsStream(ProductsIndexSettings.SETTINGS_PATH)) {
 			if (in == null) {
 				throw new IllegalStateException("Missing classpath resource: " + ProductsIndexSettings.SETTINGS_PATH);
 			}

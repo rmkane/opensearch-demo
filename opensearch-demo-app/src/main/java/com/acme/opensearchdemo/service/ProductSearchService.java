@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.acme.opensearchdemo.model.ProductDocument;
+import com.acme.opensearch.model.Product;
 
 public interface ProductSearchService {
 	Map<String, Object> createIndexUsingSpringData();
@@ -20,17 +20,17 @@ public interface ProductSearchService {
 
 	Map<String, Object> updateRefreshIntervalUsingJavaClient(String refreshInterval) throws IOException;
 
-	ProductDocument save(ProductDocument document);
+	Product save(Product document);
 
-	Optional<ProductDocument> replace(String id, ProductDocument document);
+	Optional<Product> replace(String id, Product document);
 
-	Optional<ProductDocument> update(String id, ProductDocument patch);
+	Optional<Product> update(String id, Product patch);
 
 	boolean deleteById(String id);
 
 	long purgeAll();
 
-	List<ProductDocument> findAll();
+	List<Product> findAll();
 
-	Optional<ProductDocument> findById(String id);
+	Optional<Product> findById(String id);
 }

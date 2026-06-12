@@ -1,4 +1,4 @@
-package com.acme.opensearch.model;
+package com.acme.opensearchdemo.model;
 
 /** Links and metadata returned by the demo home route ({@code GET /}). */
 public record ApiInfo(String application, String baseUrl, Documentation documentation, Actuator actuator, Api api) {

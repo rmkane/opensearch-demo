@@ -15,21 +15,20 @@ When mappers grow (nested objects, many fields, multiple targets), add MapStruct
 
 | Type | Module | Role |
 | ---- | ------ | ---- |
-| `Product` | `opensearch-model` | Framework-free domain record (shared across clients) |
-| `ProductDocument` | `opensearch-demo-app` | Spring Data OpenSearch entity (`@Document`, `@Field`) |
+| `Product` | `opensearch-model` | Domain record and Spring Data OpenSearch entity (`@Document`, `@Field`) |
 | `ProductResponse` | `opensearch-demo-app` | HTTP **response** DTO — what clients see on GET/POST/PUT/PATCH |
 
 ```
 Client JSON
     ↕  (Jackson)
-ProductResponse  ←—— OutboundMapper.toDto ——  ProductDocument
+ProductResponse  ←—— OutboundMapper.toDto ——  Product
     ↑                                              ↑
  Controller                                   Service / Repository
                                                    ↕
                                               OpenSearch index
 ```
 
-**Today:** all product endpoints return `ProductResponse`. Writes still accept `ProductDocument` in the JSON body; a future `ProductRequest` + inbound `Mapper` would complete the boundary.
+**Today:** all product endpoints return `ProductResponse`. Writes still accept `Product` in the JSON body; a future `ProductRequest` + inbound `Mapper` would complete the boundary.
 
 ## Mapper types
 
@@ -38,10 +37,10 @@ ProductResponse  ←—— OutboundMapper.toDto ——  ProductDocument
 ```java
 @Component
 public class ProductResponseMapper
-    extends AbstractOutboundMapperImpl<ProductDocument, ProductResponse> {
+    extends AbstractOutboundMapperImpl<Product, ProductResponse> {
 
   @Override
-  public ProductResponse toDto(ProductDocument entity) {
+  public ProductResponse toDto(Product entity) {
     return ProductResponse.builder()
         .id(entity.id())
         // ...
@@ -63,13 +62,13 @@ When you add `ProductRequest`, extend `AbstractMapperImpl` and implement both `t
 
 ```java
 @Component
-public class ProductMapper extends AbstractMapperImpl<ProductDocument, ProductRequest> {
+public class ProductMapper extends AbstractMapperImpl<Product, ProductRequest> {
 
   @Override
-  public ProductRequest toDto(ProductDocument entity) { ... }
+  public ProductRequest toDto(Product entity) { ... }
 
   @Override
-  public ProductDocument toEntity(ProductRequest dto) { ... }
+  public Product toEntity(ProductRequest dto) { ... }
 }
 ```
 
@@ -94,8 +93,8 @@ Do not confuse these:
 
 | Term | Meaning in this repo |
 | ---- | -------------------- |
-| **Index mapping** | OpenSearch field types (`keyword`, `text`, …) in `ProductDocument` / `ProductIndexOperations` |
-| **DTO mapping** | `ProductDocument` → `ProductResponse` in `ProductResponseMapper` |
+| **Index mapping** | OpenSearch field types (`keyword`, `text`, …) in `Product` / `ProductIndexOperations` |
+| **DTO mapping** | `Product` → `ProductResponse` in `ProductResponseMapper` |
 
 Index settings live in `opensearch-model/src/main/resources/opensearch/products/settings.json`.
 

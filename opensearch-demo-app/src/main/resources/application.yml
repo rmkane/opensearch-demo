@@ -3,6 +3,12 @@ server:
 
 app:
   base-url: ${APP_BASE_URL:}
+  # Explicit client config — bound by OpenSearchAutoConfiguration in opensearch-util.
+  opensearch:
+    uri: ${OPENSEARCH_URI}
+    username: ${OPENSEARCH_USERNAME}
+    password: "${OPENSEARCH_PASSWORD}"
+    trust-self-signed: ${OPENSEARCH_TRUST_SELF_SIGNED:true}
 
 management:
   endpoints:
@@ -16,14 +22,6 @@ management:
 spring:
   application:
     name: opensearch-demo
-
-  # The whole point of this sample: use HTTPS with an explicit port override.
-  # Set via local.env (source local.env) or OPENSEARCH_* env vars.
-  # Local Docker maps host 443 -> container 9200.
-  opensearch:
-    uris: ${OPENSEARCH_URI}
-    username: ${OPENSEARCH_USERNAME}
-    password: "${OPENSEARCH_PASSWORD}"
 
 springdoc:
   swagger-ui:
